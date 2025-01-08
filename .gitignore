@@ -1,3 +1,2 @@
-backend/bin/
-backend/obj/
-NextCore.sln
+**/bin/
+**/obj/

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace NextCore.backend.WebAPI.Controller.Controllers
+namespace NextCore.backend.WebAPI.Controllers
 {
     [Route("api/product")]
     [ApiController]
