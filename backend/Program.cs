@@ -15,7 +15,15 @@ builder.Services.AddOpenApi();
 var conString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddMySqlDataSource(conString!);
 
+// Add logging services
+builder.Logging.ClearProviders(); // Clear default providers
+builder.Logging.AddConsole(); // Add console logging
+builder.Logging.AddDebug();
+builder.Logging.SetMinimumLevel(LogLevel.Debug); // Set the minimum log level
+
+
 var app = builder.Build();
+app.Logger.LogInformation("Adding Routes");
 
 
 if (app.Environment.IsDevelopment())
