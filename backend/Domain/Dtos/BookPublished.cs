@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Core.Entities.Abstract;
 
-namespace Domain.Concrete {
+namespace Domain.Dtos {
     public class BookPublished{
         public string? bookPublishedId {get; set;} //PK
         public string? publisherId {get; set;} // FK
