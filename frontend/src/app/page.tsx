@@ -99,23 +99,33 @@
 //     </div>
 //   );
 // }
+
+
+
 'use client';  // This is necessary to mark this component as a client component
 
 import { useEffect, useState } from 'react';
 
-interface Product {
-  id: number;
-  name: string;
+interface Book {
+  bookId: string;
+  title: string;
+  datePublished: string;
+  totalPage: number;
+  country: string;
+  language: string;
+  genre: string;
+  desc: string;
 }
 
 const Home: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState<boolean>(true); // To track loading state
+  const [error, setError] = useState<string | null>(null); // To track error state
 
   useEffect(() => {
-    fetch('http://localhost:5259/api/product')
+    fetch('http://localhost:5259/api/BookController')
       .then((response) => {
         if (!response.ok) {
-          // Log if the response is not OK
           console.error('Error fetching data:', response.statusText);
           throw new Error('Network response was not ok');
         }
@@ -123,19 +133,24 @@ const Home: React.FC = () => {
       })
       .then((data) => {
         console.log('Fetched data:', data); // Log the data to inspect it
-        setProducts(data);
+        setBooks(data);
+        setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
+        setError('Failed to fetch data. Please try again later.');
+        setLoading(false);
       });
   }, []);
-  
+
   return (
     <div>
-      <h1>Products</h1>
+      <h1>Books</h1>
+      {loading && <p>Loading...</p>}  {/* Loading state */}
+      {error && <p style={{ color: 'red' }}>{error}</p>}  {/* Error message */}
       <ul>
-        {products.map((product) => (
-          <li key={product.id}>{product.name}</li>
+        {books.map((book) => (
+          <li key={book.bookId}>{book.title}</li>
         ))}
       </ul>
     </div>

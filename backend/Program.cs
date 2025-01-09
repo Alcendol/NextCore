@@ -1,3 +1,4 @@
+using MySqlConnector;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -11,7 +12,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();  
 
 builder.Services.AddOpenApi();
-
+var conString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddMySqlDataSource(conString!);
 
 var app = builder.Build();
 
