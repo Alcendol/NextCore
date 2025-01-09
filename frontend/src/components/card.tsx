@@ -12,7 +12,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ title, desc, genre, datePublished }) => {
     return (
-        <section className="bg-white dark:bg-gray-900 rounded-lg">
+        <section className="dark:bg-gray-900 rounded-lg">
             <div className="py-4 mx-auto w-full lg:py-8 lg:px-6">
                 <div className="grid gap-8 ">
                 <article
@@ -45,7 +45,7 @@ const Card: React.FC<CardProps> = ({ title, desc, genre, datePublished }) => {
                                 </span>
                             </div>
                             <div className="">
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque similique deserunt inventore voluptates quo sit recusandae a neque. Est quisquam quia impedit ad magni libero esse neque eaque dolorum accusantium rem, maiores optio illum? Iure a impedit, deserunt, harum commodi inventore magnam et doloremque reprehenderit aspernatur corrupti labore blanditiis nostrum!</p>
+                                <p>{desc}</p>
                                 <span className="bg-blue-500 text-white text-xs font-medium inline-flex items-center px-2.5 py-1.5 mt-2 rounded mr-3">
                                     <a href={`/home`} className="hover:underline">
                                         {genre}
