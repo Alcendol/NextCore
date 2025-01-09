@@ -31,8 +31,8 @@ export default function DashboardLayout({
   };
   return (
     <>
-      <header className="h-20 bg-gray-100 border-b border-gray-200">
-        <div className="max-w-screen mx-auto flex justify-between items-center h-full px-6 md:px-32">
+      <header className="fixed top-0 left-0 w-full h-20 bg-gray-100 border-b border-gray-200 z-50">
+        <div className="container mx-auto flex justify-between items-center h-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
             <Link href="/home" className="flex items-center gap-2">
               <Image
@@ -51,27 +51,27 @@ export default function DashboardLayout({
             <ul className="flex items-center gap-6 text-gray-700 text-sm font-medium">
               <div className="h-20 w-full hover:bg-slate-300 flex items-center px-3">
                 <li className="hover:bg-slate-300 mx-auto">
-                  <Link href="/">Home</Link>
+                  <Link href="/home">Home</Link>
                 </li>
               </div>
               <div className="h-20 w-full hover:bg-slate-300 flex items-center px-3">
                 <li className="hover:bg-slate-300 mx-auto">
-                  <Link href="/" >About Us</Link>
+                  <Link href="/aboutus" >About Us</Link>
                 </li>
               </div>
               <div className="h-20 w-full hover:bg-slate-300 flex items-center px-3">
                 <li className="hover:bg-slate-300 mx-auto">
-                  <Link href="/" >Peminjaman Buku</Link>
+                  <Link href="/peminjamanbuku" >Peminjaman Buku</Link>
                 </li>
               </div>
               <div className="h-20 w-full hover:bg-slate-300 flex items-center px-3">
                 <li className="hover:bg-slate-300 mx-auto">
-                  <Link href="/">E-Book</Link>
+                  <Link href="/ebook">E-Book</Link>
                 </li>
               </div>
               <div className="h-20 w-full hover:bg-slate-300 flex items-center px-3">
                 <li className="hover:bg-slate-300 mx-auto">
-                  <Link href="/">AudioBook</Link>
+                  <Link href="/audiobook">AudioBook</Link>
                 </li>
               </div>
             </ul>
@@ -107,17 +107,17 @@ export default function DashboardLayout({
           <div className="xl:hidden bg-black border-t border-gray-200">
             <ul className="flex flex-col items-start gap-4 py-4 text-white text-sm font-medium md:px-32">
               <li className="w-full">
-                <Link href="/" className="w-full" onClick={toggleMenu}>
+                <Link href="/home" className="w-full" onClick={toggleMenu}>
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/about-us" onClick={toggleMenu}>
+                <Link href="/aboutus" onClick={toggleMenu}>
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/peminjaman-buku" onClick={toggleMenu}>
+                <Link href="/peminjamanbuku" onClick={toggleMenu}>
                   Peminjaman Buku
                 </Link>
               </li>
@@ -158,7 +158,7 @@ export default function DashboardLayout({
       </header>
 
       {/* Main Content Section */}
-      <main className="max-w-screen-lg mx-auto px-4 mt-6">{children}</main>
+      <main className="container mx-auto px-4 mt-28">{children}</main>
     </>
   );
 }
