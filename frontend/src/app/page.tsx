@@ -105,6 +105,7 @@
 'use client';  // This is necessary to mark this component as a client component
 
 import { useEffect, useState } from 'react';
+import Card from '@/components/card';
 
 interface Book {
   bookId: string;
@@ -144,15 +145,21 @@ const Home: React.FC = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Books</h1>
-      {loading && <p>Loading...</p>}  {/* Loading state */}
-      {error && <p style={{ color: 'red' }}>{error}</p>}  {/* Error message */}
-      <ul>
+    <div className="my-10">
+      <h1 className="text-xl font-bold mb-4">Books</h1>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {books.map((book) => (
-          <li key={book.bookId}>{book.title}</li>
+          <Card
+            key={book.bookId}
+            title={book.title}
+            desc={book.desc}
+            genre={book.genre}
+            datePublished={book.datePublished}
+          />
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
