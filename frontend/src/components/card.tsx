@@ -1,14 +1,22 @@
 import { IoSearch } from "react-icons/io5"
 import { IoNotificationsCircleSharp } from "react-icons/io5"
 import Image from "next/image"
+import React from "react";
 
-const Card = () => {
+interface CardProps {
+    title: string;
+    desc: string;
+    genre: string;
+    datePublished: string;
+  }
+
+const Card: React.FC<CardProps> = ({ title, desc, genre, datePublished }) => {
     return (
         <section className="bg-white dark:bg-gray-900 rounded-lg">
             <div className="py-4 mx-auto w-full lg:py-8 lg:px-6">
                 <div className="grid gap-8 ">
                 <article
-                    key={"slug"}
+                    key={title}
                     className="p-6 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700"
                     >
                     <div className="flex flex-col md:flex-row gap-4">
@@ -25,7 +33,7 @@ const Card = () => {
                             <div className="flex justify-between">
                                 <h2 className="mb-2 text-lg md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                                     <a href={`/home`} className="hover:underline">
-                                        Title
+                                        {title}
                                     </a>
                                     <span> - </span>
                                     <a href={`/home`} className="hover:underline font-light text-gray-500 text-lg md:text-xl">
@@ -33,29 +41,14 @@ const Card = () => {
                                     </a>
                                 </h2>
                                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                                    Published At
+                                    {datePublished}
                                 </span>
                             </div>
                             <div className="">
                                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque similique deserunt inventore voluptates quo sit recusandae a neque. Est quisquam quia impedit ad magni libero esse neque eaque dolorum accusantium rem, maiores optio illum? Iure a impedit, deserunt, harum commodi inventore magnam et doloremque reprehenderit aspernatur corrupti labore blanditiis nostrum!</p>
                                 <span className="bg-blue-500 text-white text-xs font-medium inline-flex items-center px-2.5 py-1.5 mt-2 rounded mr-3">
                                     <a href={`/home`} className="hover:underline">
-                                        Genre
-                                    </a>
-                                </span>
-                                <span className="bg-yellow-500 text-white text-xs font-medium inline-flex items-center px-2.5 py-1.5 mt-2 rounded mr-3">
-                                    <a href={`/home`} className="hover:underline">
-                                        Genre
-                                    </a>
-                                </span>
-                                <span className="bg-orange-500 text-white text-xs font-medium inline-flex items-center px-2.5 py-1.5 mt-2 rounded mr-3">
-                                    <a href={`/home`} className="hover:underline">
-                                        Genre
-                                    </a>
-                                </span>
-                                <span className="bg-red-500 text-white text-xs font-medium inline-flex items-center px-2.5 py-1.5 mt-2 rounded mr-3">
-                                    <a href={`/home`} className="hover:underline">
-                                        Genre
+                                        {genre}
                                     </a>
                                 </span>
                             </div>
