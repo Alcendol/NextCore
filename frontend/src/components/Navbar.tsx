@@ -64,7 +64,7 @@ const Navbar = () => {
                             <div className="hidden"></div>
                         </div>
                         <Link
-                            href="/login"
+                            href="/signin"
                             className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 transition"
                         >
                             Login
@@ -118,7 +118,7 @@ const Navbar = () => {
                         </Link>
                         <li className="flex justify-between w-full">
                             <Link
-                                href="/login"
+                                href="/signin"
                                 className="px-4 py-2 border bg-slate-200 border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-400 transition w-5/6 mr-5 flex justify-center"
                                 onClick={toggleMenu}>
                                     Login
