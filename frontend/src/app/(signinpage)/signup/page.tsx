@@ -1,7 +1,7 @@
 const SignupPage = () => {
     return (
         <div>
-            <h1>Sign-up Page</h1>
+            <h1 className="container mx-auto">Sign-up Page</h1>
         </div>
     )
 }
