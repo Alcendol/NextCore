@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 public class AudioBook {
-    public int bookId {get; set;} // Nanti isinya pake isbn, jangan generate
-    public int audiobookId  {get; set;} // Nanti isinya auto increment
-    public string? audioDatePublished {get; set;} // Date publishednya berbeda dengan Buku Fisik
+    public required int bookId {get; set;} // Nanti isinya pake isbn, jangan generate
+    public required int audiobookId  {get; set;} // Nanti isinya auto increment
+    public required DateTime audioDatePublished {get; set;} // Date publishednya berbeda dengan Buku Fisik
 }

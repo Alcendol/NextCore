@@ -1,5 +1,5 @@
 public class Authorship {
-    public string? authorshipId {get; set;} //PK
-    public string? authorId {get; set;} //FK
-    public string? bookId {get; set;} //FK
+    public required string authorshipId {get; set;} //PK
+    public required string authorId {get; set;} //FK to author
+    public required string bookId {get; set;} //FK to book
 }
