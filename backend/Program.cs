@@ -1,3 +1,6 @@
+using auth.Data;
+using auth.Helpers;
+using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,14 +9,22 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
         policy.WithOrigins("http://localhost:3001") 
               .AllowAnyMethod()
-              .AllowAnyHeader());
+              .AllowAnyHeader()
+              .AllowCredentials());
+    
+    
 });
 
-builder.Services.AddControllers();  
 
-builder.Services.AddOpenApi();
 var conString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddMySqlDataSource(conString!);
+builder.Services.AddDbContext<UserContext>(options =>
+    options.UseMySql(conString!, new MySqlServerVersion(new Version(8,1,0)))
+);
+
+builder.Services.AddControllers();  
+builder.Services.AddOpenApi();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<JwtService>();
 
 // Add logging services
 builder.Logging.ClearProviders(); // Clear default providers
@@ -30,7 +41,6 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi(); 
 }
-
 app.UseCors("AllowFrontend"); 
 app.UseRouting();
 app.MapControllers();  
