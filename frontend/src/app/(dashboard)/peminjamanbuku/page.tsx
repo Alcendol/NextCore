@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react'
 interface Book {
     bookId: string;
     title: string;
+    authorName: string;
+    publisherName: string;
     datePublished: string;
     totalPage: number;
     country: string;
@@ -20,7 +22,7 @@ const PeminjamanBukuPage: React.FC = () => {
       const [error, setError] = useState<string | null>(null); // To track error state
     
       useEffect(() => {
-        fetch('http://localhost:5259/api/BookController')
+        fetch('http://localhost:5259/api/book/')
           .then((response) => {
             if (!response.ok) {
               console.error('Error fetching data:', response.statusText);
@@ -53,6 +55,7 @@ const PeminjamanBukuPage: React.FC = () => {
                     desc={book.desc}
                     genre={book.genre}
                     datePublished={book.datePublished}
+                    authorName={book.authorName}
                 />
             ))}
         </div>

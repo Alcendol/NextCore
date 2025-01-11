@@ -5,12 +5,13 @@ import React from "react";
 
 interface CardProps {
     title: string;
+    authorName: string;
     desc: string;
     genre: string;
     datePublished: string;
   }
 
-const Card: React.FC<CardProps> = ({ title, desc, genre, datePublished }) => {
+const Card: React.FC<CardProps> = ({ title, desc, genre, datePublished, authorName }) => {
     return (
         <section className="dark:bg-gray-900 rounded-lg">
             <div className="py-4 mx-auto w-full lg:py-8 lg:px-6">
@@ -37,7 +38,7 @@ const Card: React.FC<CardProps> = ({ title, desc, genre, datePublished }) => {
                                     </a>
                                     <span> - </span>
                                     <a href={`/home`} className="hover:underline font-light text-gray-500 text-lg md:text-xl">
-                                        Author
+                                        {authorName}
                                     </a>
                                 </h2>
                                 <span className="text-sm text-gray-500 dark:text-gray-400">
