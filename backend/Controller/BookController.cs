@@ -38,8 +38,8 @@ public class BookController : ControllerBase
                 string query = @"
                     SELECT 
                         b.bookId, 
-                        GROUP_CONCAT(DISTINCT a.authorName SEPARATOR ', ') AS authorName, 
-                        p.publisherName, 
+                        GROUP_CONCAT(DISTINCT a.authorName SEPARATOR ', ') AS authorName,
+                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
                         b.title, 
                         b.datePublished,
                         b.totalPage, 
@@ -53,17 +53,17 @@ public class BookController : ControllerBase
                     FROM 
                         books b
                     JOIN 
-                        bookPublished bp ON b.bookId = bp.bookId
+                        booksPublished bp ON b.bookId = bp.bookId
                     JOIN 
-                        publisher p ON bp.publisherId = p.publisherId
+                        publishers p ON bp.publisherId = p.publisherId
                     JOIN 
-                        authorship at ON b.bookId = at.bookId
+                        authorships at ON b.bookId = at.bookId
                     JOIN 
-                        author a ON a.authorId = at.authorId
+                        authors a ON a.authorId = at.authorId
                     LEFT JOIN 
-                        bookGenre bg ON bg.bookId = b.bookId
+                        bookGenres bg ON bg.bookId = b.bookId
                     LEFT JOIN 
-                        genre g ON bg.genreId = g.genreId
+                        genres g ON bg.genreId = g.genreId
                     GROUP BY 
                         b.bookId;
                 ";
@@ -141,17 +141,17 @@ public class BookController : ControllerBase
                     FROM 
                         books b
                     JOIN 
-                        bookPublished bp ON b.bookId = bp.bookId
+                        booksPublished bp ON b.bookId = bp.bookId
                     JOIN 
-                        publisher p ON bp.publisherId = p.publisherId
+                        publishers p ON bp.publisherId = p.publisherId
                     JOIN 
-                        authorship at ON b.bookId = at.bookId
+                        authorships at ON b.bookId = at.bookId
                     JOIN 
-                        author a ON a.authorId = at.authorId
+                        authors a ON a.authorId = at.authorId
                     LEFT JOIN 
-                        bookGenre bg ON bg.bookId = b.bookId
+                        bookGenres bg ON bg.bookId = b.bookId
                     LEFT JOIN 
-                        genre g ON bg.genreId = g.genreId
+                        genres g ON bg.genreId = g.genreId
                     WHERE 
                         b.bookId = @bookId
                     GROUP BY 
@@ -234,17 +234,17 @@ public class BookController : ControllerBase
                     FROM 
                         books b
                     JOIN 
-                        bookPublished bp ON b.bookId = bp.bookId
+                        booksPublished bp ON b.bookId = bp.bookId
                     JOIN 
-                        publisher p ON bp.publisherId = p.publisherId
+                        publishers p ON bp.publisherId = p.publisherId
                     JOIN 
-                        authorship at ON b.bookId = at.bookId
+                        authorships at ON b.bookId = at.bookId
                     JOIN 
-                        author a ON a.authorId = at.authorId
+                        authors a ON a.authorId = at.authorId
                     LEFT JOIN 
-                        bookGenre bg ON bg.bookId = b.bookId
+                        bookGenres bg ON bg.bookId = b.bookId
                     LEFT JOIN 
-                        genre g ON bg.genreId = g.genreId
+                        genres g ON bg.genreId = g.genreId
                     WHERE 
                         a.authorId = @AuthorId
                     GROUP BY 
@@ -329,17 +329,17 @@ public class BookController : ControllerBase
                     FROM 
                         books b
                     JOIN 
-                        bookPublished bp ON b.bookId = bp.bookId
+                        booksPublished bp ON b.bookId = bp.bookId
                     JOIN 
-                        publisher p ON bp.publisherId = p.publisherId
+                        publishers p ON bp.publisherId = p.publisherId
                     JOIN 
-                        authorship at ON b.bookId = at.bookId
+                        authorships at ON b.bookId = at.bookId
                     JOIN 
-                        author a ON a.authorId = at.authorId
+                        authors a ON a.authorId = at.authorId
                     LEFT JOIN 
-                        bookGenre bg ON bg.bookId = b.bookId
+                        bookGenres bg ON bg.bookId = b.bookId
                     LEFT JOIN 
-                        genre g ON bg.genreId = g.genreId
+                        genres g ON bg.genreId = g.genreId
                     WHERE 
                         p.publisherId = @publisherId
                     GROUP BY 
@@ -427,13 +427,13 @@ public class BookController : ControllerBase
                     JOIN 
                         genre g ON g.genreId = bg.genreId
                     JOIN 
-                        authorship at ON b.bookId = at.bookId
+                        authorships at ON b.bookId = at.bookId
                     JOIN 
-                        author a ON a.authorId = at.authorId
+                        authors a ON a.authorId = at.authorId
                     JOIN 
-                        bookPublished bp ON b.bookId = bp.bookId
+                        booksPublished bp ON b.bookId = bp.bookId
                     JOIN 
-                        publisher p ON p.publisherId = bp.publisherId
+                        publishers p ON p.publisherId = bp.publisherId
                     WHERE 
                         g.genreId = @genreId
                     GROUP BY 
@@ -485,7 +485,7 @@ public class BookController : ControllerBase
     }
 
     [HttpPost("single")]
-    public IActionResult<Book> AddSingleBook(Book book)
+    public IActionResult AddSingleBook(Book book)
     {
         _logger.LogDebug("Adding a single book to the library.");
 
@@ -513,7 +513,7 @@ public class BookController : ControllerBase
                     command.Parameters.AddWithValue("@country", book.country);
                     command.Parameters.AddWithValue("@language", book.language);
                     command.Parameters.AddWithValue("@genre", book.genre);
-                    command.Parameters.AddWithValue("@desc", book.description);
+                    command.Parameters.AddWithValue("@desc", book.desc);
 
                     command.ExecuteNonQuery();
                 }
@@ -530,7 +530,7 @@ public class BookController : ControllerBase
     }
 
     [HttpPost("multiple")]
-    public IActionResult<List<Book>> AddMultipleBooks(List<Book> bookList)
+    public IActionResult AddMultipleBooks(List<Book> bookList)
     {
         _logger.LogDebug("Adding multiple books to the library.");
 
@@ -564,7 +564,7 @@ public class BookController : ControllerBase
                         command.Parameters.AddWithValue("@country", book.country);
                         command.Parameters.AddWithValue("@language", book.language);
                         command.Parameters.AddWithValue("@genre", book.genre);
-                        command.Parameters.AddWithValue("@desc", book.description);
+                        command.Parameters.AddWithValue("@desc", book.desc);
 
                         command.ExecuteNonQuery();
                     }

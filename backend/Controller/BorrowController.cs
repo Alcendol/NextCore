@@ -147,83 +147,79 @@ public class BorrowController : ControllerBase
         }
     }
 
-    [HttpPost("{userId}")]
-    public IActionResult<Borrow> borrowBooks(list<Book> bookList, Borrow borrow){
-        _logger.LogDebug("Adding new borrow order of a user to the database.");
+    // [HttpPost("{userId}")]
+    // public IActionResult borrowBooks([FromBody] List<Book> bookList, [FromBody] Borrow borrow){
+    //     _logger.LogDebug("Adding new borrow order of a user to the database.");
 
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-            using (var connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
+    //     try
+    //     {
+    //         var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
+    //         using (var connection = new MySqlConnection(connectionString))
+    //         {
+    //             connection.Open();
 
-                string query = @"
-                    INSERT INTO borrow (
-                        borrowId, 
-                        userId, 
-                        borrowDate, 
-                        returnDate, 
-                        pending, 
-                        borrowed, 
-                        returned
-                    )VALUES (
-                        @borrowId, 
-                        @userId,   
-                        @borrowDate, 
-                        @returnDate, 
-                        @pending, 
-                        @borrowed, 
-                        @returned
-                    )";
+    //             string query = @"
+    //                 INSERT INTO borrow (
+    //                     borrowId, 
+    //                     userId, 
+    //                     borrowDate, 
+    //                     returnDate, 
+    //                     pending, 
+    //                     borrowed, 
+    //                     returned
+    //                 )VALUES (
+    //                     @borrowId, 
+    //                     @userId,   
+    //                     @borrowDate, 
+    //                     @returnDate, 
+    //                     @pending, 
+    //                     @borrowed, 
+    //                     @returned
+    //                 )";
                                 
-                using (var command = new MySqlCommand(query, connection)){
-                    foreach (var borrow in borrowList){
-                        command.Parameters.Clear();
-                        command.Parameters.AddWithValue("@borrowId", borrow.borrowId);
-                        command.Parameters.AddWithValue("@userId", borrow.userId);
-                        command.Parameters.AddWithValue("@borrowDate", borrow.borrowDate);
-                        command.Parameters.AddWithValue("@returnDate", borrow.returnDate);
-                        command.Parameters.AddWithValue("@pending", borrow.pending);
-                        command.Parameters.AddWithValue("@borrowed", borrow.borrowed);
-                        command.Parameters.AddWithValue("@returned", borrow.returned);
+    //             using (var command = new MySqlCommand(query, connection)){
+    //                     command.Parameters.AddWithValue("@borrowId", borrow.borrowId);
+    //                     command.Parameters.AddWithValue("@userId", borrow.userId);
+    //                     command.Parameters.AddWithValue("@borrowDate", borrow.borrowDate);
+    //                     command.Parameters.AddWithValue("@returnDate", borrow.returnDate);
+    //                     command.Parameters.AddWithValue("@pending", borrow.pending);
+    //                     command.Parameters.AddWithValue("@borrowed", borrow.borrowed);
+    //                     command.Parameters.AddWithValue("@returned", borrow.returned);
+    //                     command.ExecuteNonQuery();
+    //             }
 
-                        command.ExecuteNonQuery();
-                    }
-                }
+    //             query = @"
+    //                 INSERT INTO borrowedBook(
+    //                     borrowId,
+    //                     bookId,
+    //                     returnDate,
+    //                     status    
+    //                 )VALUES(
+    //                     @borrowId,
+    //                     @bookId,
+    //                     @returnDate,
+    //                     @status
+    //                 )";
+    //             using (var bookCommand = new MySqlCommand(query, connection)){
+    //                 foreach (var book in bookList){
+    //                     bookCommand.Parameters.Clear();
+    //                     bookCommand.Parameters.AddWithValue("@borrowId", borrow.borrowId);
+    //                     bookCommand.Parameters.AddWithValue("@bookId", book.bookId);
+    //                     bookCommand.Parameters.AddWithValue("@returnDate", DBNull.Value); // Default to NULL
+    //                     bookCommand.Parameters.AddWithValue("@status", BorrowStatus.Pending.ToString());
 
-                query = @"
-                    INSERT INTO borrowedBook(
-                        borrowId,
-                        bookId,
-                        returnDate,
-                        status    
-                    )VALUES(
-                        @borrowId,
-                        @bookId,
-                        @returnDate,
-                        @status
-                    )";
-                using (var bookCommand = new MySqlCommand(borrowedBookQuery, connection)){
-                    foreach (var book in bookList){
-                        bookCommand.Parameters.Clear();
-                        bookCommand.Parameters.AddWithValue("@borrowId", borrow.borrowId);
-                        bookCommand.Parameters.AddWithValue("@bookId", book.bookId);
-                        bookCommand.Parameters.AddWithValue("@returnDate", DBNull.Value); // Default to NULL
-                        bookCommand.Parameters.AddWithValue("@status", BorrowStatus.Pending.ToString());
+    //                     bookCommand.ExecuteNonQuery();
+    //                 }
+    //             }
+    //         }
 
-                        bookCommand.ExecuteNonQuery();
-                    }
-                }
-            }
-
-            _logger.LogDebug("Borrow Order successfully added.");
-            return Ok(bookList);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while borrow order.");
-            return StatusCode(500, "Internal server error.");
-        }
-    }
+    //         _logger.LogDebug("Borrow Order successfully added.");
+    //         return Ok(bookList);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "Error occurred while borrow order.");
+    //         return StatusCode(500, "Internal server error.");
+    //     }
+    // }
 }
