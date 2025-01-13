@@ -18,7 +18,7 @@ namespace auth.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm]RegisterDto dto) {
+        public async Task<IActionResult> Register([FromForm] RegisterDTO dto) {
             if (dto.imageKtp == null || dto.imageKtp.Length == 0)
                 return BadRequest("KTP image is required.");
 
