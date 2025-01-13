@@ -11,7 +11,7 @@ public class BookController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<BookController> _logger;
-    public List<Book> BooksList { get; set; } = new List<Book>();
+    public List<BookDTO> BooksList { get; set; } = new List<BookDTO>();
 
     // Constructor with ILogger dependency injection
     public BookController(IConfiguration configuration, ILogger<BookController> logger)
@@ -77,7 +77,7 @@ public class BookController : ControllerBase
 
                         while (reader.Read())
                         {
-                            Book book = new Book
+                            BookDTO book = new BookDTO
                             {
                                 bookId = reader.GetString(0),
                                 authorName = reader.GetString(1),
@@ -166,7 +166,7 @@ public class BookController : ControllerBase
                     {
                         _logger.LogDebug("Query executed successfully. Reading data...");
                         if(reader.Read())
-                        {    Book book = new Book
+                        {    BookDTO book = new BookDTO
                             {
                                 bookId = reader.GetString(0),
                                 authorName = reader.GetString(1),
@@ -263,7 +263,7 @@ public class BookController : ControllerBase
 
                         while (reader.Read())
                         {
-                            Book book = new Book
+                            BookDTO book = new BookDTO
                             {
                                 bookId = reader.GetString(0),
                                 authorName = reader.GetString(1),
@@ -358,7 +358,7 @@ public class BookController : ControllerBase
 
                         while (reader.Read())
                         {
-                            Book book = new Book
+                            BookDTO book = new BookDTO
                             {
                                 bookId = reader.GetString(0),
                                 authorName = reader.GetString(1),
@@ -452,7 +452,7 @@ public class BookController : ControllerBase
 
                         while (reader.Read())
                         {
-                            Book book = new Book
+                            BookDTO book = new BookDTO
                             {
                                 bookId = reader.GetString(0),
                                 authorName = reader.GetString(1),
@@ -484,101 +484,101 @@ public class BookController : ControllerBase
         }
     }
 
-    [HttpPost("single")]
-    public IActionResult AddSingleBook(Book book)
-    {
-        _logger.LogDebug("Adding a single book to the library.");
+    // [HttpPost("single")]
+    // public IActionResult AddSingleBook(Book book)
+    // {
+    //     _logger.LogDebug("Adding a single book to the library.");
 
-        book.country ??= "";
-        book.language ??= "";
+    //     book.country ??= "";
+    //     book.language ??= "";
 
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-            using (var connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
+    //     try
+    //     {
+    //         var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
+    //         using (var connection = new MySqlConnection(connectionString))
+    //         {
+    //             connection.Open();
 
-                string query = @"INSERT INTO books 
-                                (bookId, title, datePublished, totalPage, country, language, genre, description) 
-                                VALUES 
-                                (@bookId, @title, @datePublished, @totalPage, @country, @language, @genre, @desc)";
+    //             string query = @"INSERT INTO books 
+    //                             (bookId, title, datePublished, totalPage, country, language, genre, description) 
+    //                             VALUES 
+    //                             (@bookId, @title, @datePublished, @totalPage, @country, @language, @genre, @desc)";
                                 
-                using (var command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@bookId", book.bookId);
-                    command.Parameters.AddWithValue("@title", book.title);
-                    command.Parameters.AddWithValue("@datePublished", book.datePublished);
-                    command.Parameters.AddWithValue("@totalPage", book.totalPage);
-                    command.Parameters.AddWithValue("@country", book.country);
-                    command.Parameters.AddWithValue("@language", book.language);
-                    command.Parameters.AddWithValue("@genre", book.genre);
-                    command.Parameters.AddWithValue("@desc", book.desc);
+    //             using (var command = new MySqlCommand(query, connection))
+    //             {
+    //                 command.Parameters.AddWithValue("@bookId", book.bookId);
+    //                 command.Parameters.AddWithValue("@title", book.title);
+    //                 command.Parameters.AddWithValue("@datePublished", book.datePublished);
+    //                 command.Parameters.AddWithValue("@totalPage", book.totalPage);
+    //                 command.Parameters.AddWithValue("@country", book.country);
+    //                 command.Parameters.AddWithValue("@language", book.language);
+    //                 command.Parameters.AddWithValue("@genre", book.genre);
+    //                 command.Parameters.AddWithValue("@desc", book.desc);
 
-                    command.ExecuteNonQuery();
-                }
-            }
+    //                 command.ExecuteNonQuery();
+    //             }
+    //         }
 
-            _logger.LogDebug("Book successfully added.");
-            return Ok(book);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while adding a single book.");
-            return StatusCode(500, "Internal server error.");
-        }
-    }
+    //         _logger.LogDebug("Book successfully added.");
+    //         return Ok(book);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "Error occurred while adding a single book.");
+    //         return StatusCode(500, "Internal server error.");
+    //     }
+    // }
 
-    [HttpPost("multiple")]
-    public IActionResult AddMultipleBooks(List<Book> bookList)
-    {
-        _logger.LogDebug("Adding multiple books to the library.");
+    // [HttpPost("multiple")]
+    // public IActionResult AddMultipleBooks(List<Book> bookList)
+    // {
+    //     _logger.LogDebug("Adding multiple books to the library.");
 
-        foreach (var book in bookList)
-        {
-            book.country ??= "";
-            book.language ??= "";
-        }
+    //     foreach (var book in bookList)
+    //     {
+    //         book.country ??= "";
+    //         book.language ??= "";
+    //     }
 
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-            using (var connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
+    //     try
+    //     {
+    //         var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
+    //         using (var connection = new MySqlConnection(connectionString))
+    //         {
+    //             connection.Open();
 
-                string query = @"INSERT INTO books 
-                                (bookId, title, datePublished, totalPage, country, language, genre, description) 
-                                VALUES 
-                                (@bookId, @title, @datePublished, @totalPage, @country, @language, @genre, @desc)";
+    //             string query = @"INSERT INTO books 
+    //                             (bookId, title, datePublished, totalPage, country, language, genre, description) 
+    //                             VALUES 
+    //                             (@bookId, @title, @datePublished, @totalPage, @country, @language, @genre, @desc)";
                                 
-                using (var command = new MySqlCommand(query, connection))
-                {
-                    foreach (var book in bookList)
-                    {
-                        command.Parameters.Clear();
-                        command.Parameters.AddWithValue("@bookId", book.bookId);
-                        command.Parameters.AddWithValue("@title", book.title);
-                        command.Parameters.AddWithValue("@datePublished", book.datePublished);
-                        command.Parameters.AddWithValue("@totalPage", book.totalPage);
-                        command.Parameters.AddWithValue("@country", book.country);
-                        command.Parameters.AddWithValue("@language", book.language);
-                        command.Parameters.AddWithValue("@genre", book.genre);
-                        command.Parameters.AddWithValue("@desc", book.desc);
+    //             using (var command = new MySqlCommand(query, connection))
+    //             {
+    //                 foreach (var book in bookList)
+    //                 {
+    //                     command.Parameters.Clear();
+    //                     command.Parameters.AddWithValue("@bookId", book.bookId);
+    //                     command.Parameters.AddWithValue("@title", book.title);
+    //                     command.Parameters.AddWithValue("@datePublished", book.datePublished);
+    //                     command.Parameters.AddWithValue("@totalPage", book.totalPage);
+    //                     command.Parameters.AddWithValue("@country", book.country);
+    //                     command.Parameters.AddWithValue("@language", book.language);
+    //                     command.Parameters.AddWithValue("@genre", book.genre);
+    //                     command.Parameters.AddWithValue("@desc", book.desc);
 
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
+    //                     command.ExecuteNonQuery();
+    //                 }
+    //             }
+    //         }
 
-            _logger.LogDebug("Books successfully added.");
-            return Ok(bookList);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while adding multiple books.");
-            return StatusCode(500, "Internal server error.");
-        }
-    }
+    //         _logger.LogDebug("Books successfully added.");
+    //         return Ok(bookList);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "Error occurred while adding multiple books.");
+    //         return StatusCode(500, "Internal server error.");
+    //     }
+    // }
 
 }

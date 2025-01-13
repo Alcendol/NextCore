@@ -53,7 +53,7 @@ namespace auth.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login(LoginDto dto) {
+        public IActionResult Login(LoginDTO dto) {
             var user = _repository.GetByEmail(dto.userEmail);
             if (user == null) return BadRequest(new {message= "Invalid Credentials"});
             if (!BCrypt.Net.BCrypt.Verify(dto.password, user.password))
@@ -70,7 +70,7 @@ namespace auth.Controllers
 
             return Ok(
                 new{
-                    message = "succes"
+                    message = "success"
                 }
             );
         }

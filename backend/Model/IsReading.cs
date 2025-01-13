@@ -1,6 +1,6 @@
 public class IsReading{
     public required string IsReadingId {get; set;}
-    public required string userId {get; set;}
+    public required int userId {get; set;}
     public required string eBookId {get; set;}
     public required int lastPage {get; set;} // jika statusnya notset, lastpage bisa kosong
     public required DateTime lastRead {get; set;} // Terakhir kali baca kapan (dihitung ketika status sudah ter-set)
