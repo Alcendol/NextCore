@@ -318,3 +318,397 @@ export default function Home() {
 // };
 
 // export default BorrowTest;
+
+
+// 'use client';
+// import { useState } from 'react';
+
+// const BorrowPage = () => {
+//   const [userId, setUserId] = useState('');
+//   const [borrowId, setBorrowId] = useState('');
+//   const [bookId, setBookId] = useState('');
+//   const [borrowData, setBorrowData] = useState<borrow[]>([]);
+//   const [borrowedBooks, setBorrowedBooks] = useState<book[]>([]);
+//   const [message, setMessage] = useState('');
+
+//   interface borrow {
+//     borrowId: string;
+//     userId: string;
+//     borrowDate: string;
+//     returnDate: string;
+//     pendingBooks: number;
+//     borrowedBooks: number;
+//     returnedBooks: number;
+//   }
+
+//   interface book{
+//     borrowId: string;
+//     bookId: string;
+//     title: string;
+//     authorName: string;
+//     returnDate: string;
+//     status: string;
+//   }
+
+//   const handleFetchBorrowHistory = async () => {
+//     try {
+//       const response = await fetch(`http://localhost:5259/api/borrow/${userId}`);
+//       if (!response.ok) {
+//         throw new Error('Failed to fetch borrow history.');
+//       }
+//       const data = await response.json();
+//       setBorrowData(data);
+//       setMessage('');
+//     } catch (err) {
+//       setMessage((err as Error).message);
+//     }
+//   };
+
+//   const handleFetchBorrowedBooks = async () => {
+//     try {
+//       const response = await fetch(`http://localhost:5259/api/borrow/borrowed-books/${borrowId}`);
+//       if (!response.ok) {
+//         throw new Error('Failed to fetch borrowed books.');
+//       }
+//       const data = await response.json();
+//       setBorrowedBooks(data);
+//       setMessage('');
+//     } catch (err) {
+//       setMessage((err as Error).message);
+//     }
+//   };
+
+//   const handleCancelBorrow = async () => {
+//     try {
+//       const response = await fetch(`http://localhost:5259/api/borrow/cancel-borrow/${borrowId}`, {
+//         method: 'DELETE',
+//       });
+//       if (!response.ok) {
+//         throw new Error('Failed to cancel borrow order.');
+//       }
+//       const data = await response.json();
+//       setMessage(data.Message || 'Borrow order canceled successfully.');
+//     } catch (err) {
+//       setMessage((err as Error).message);
+//     }
+//   };
+
+//   const handleCancelBook = async () => {
+//     try {
+//       const response = await fetch(`http://localhost:5259/api/borrow/${borrowId}/${bookId}`, {
+//         method: 'DELETE',
+//       });
+//       if (!response.ok) {
+//         throw new Error('Failed to cancel book.');
+//       }
+//       const data = await response.json();
+//       setMessage(data.Message || 'Book canceled successfully.');
+//     } catch (err) {
+//       setMessage((err as Error).message);
+//     }
+//   };
+
+//   return (
+//     <div style={{ padding: '20px' }}>
+//       <h1>Borrow API Test</h1>
+//       {message && <p style={{ color: 'red' }}>{message}</p>}
+
+//       {/* Fetch Borrow History */}
+//       <div>
+//         <h2>Fetch Borrow History</h2>
+//         <input
+//           type="text"
+//           placeholder="User ID"
+//           value={userId}
+//           onChange={(e) => setUserId(e.target.value)}
+//         />
+//         <button onClick={handleFetchBorrowHistory}>Fetch History</button>
+//         {borrowData.length > 0 && (
+//           <ul>
+//             {borrowData.map((borrow) => (
+//               <li key={borrow.borrowId}>
+//                 Borrow ID: {borrow.borrowId}, Pending: {borrow.pendingBooks}, Borrowed: {borrow.borrowedBooks}, Returned: {borrow.returnedBooks}
+//               </li>
+//             ))}
+//           </ul>
+//         )}
+//       </div>
+
+//       {/* Fetch Borrowed Books */}
+//       <div>
+//         <h2>Fetch Borrowed Books</h2>
+//         <input
+//           type="text"
+//           placeholder="Borrow ID"
+//           value={borrowId}
+//           onChange={(e) => setBorrowId(e.target.value)}
+//         />
+//         <button onClick={handleFetchBorrowedBooks}>Fetch Books</button>
+//         {borrowedBooks.length > 0 && (
+//           <ul>
+//             {borrowedBooks.map((book) => (
+//               <li key={book.bookId}>
+//                 Book ID: {book.bookId}, Title: {book.title}, Author: {book.authorName}, Status: {book.status}
+//               </li>
+//             ))}
+//           </ul>
+//         )}
+//       </div>
+
+//       {/* Cancel Borrow Order */}
+//       <div>
+//         <h2>Cancel Borrow Order</h2>
+//         <input
+//           type="text"
+//           placeholder="Borrow ID"
+//           value={borrowId}
+//           onChange={(e) => setBorrowId(e.target.value)}
+//         />
+//         <button onClick={handleCancelBorrow}>Cancel Order</button>
+//       </div>
+
+//       {/* Cancel Specific Book */}
+//       <div>
+//         <h2>Cancel Book</h2>
+//         <input
+//           type="text"
+//           placeholder="Borrow ID"
+//           value={borrowId}
+//           onChange={(e) => setBorrowId(e.target.value)}
+//         />
+//         <input
+//           type="text"
+//           placeholder="Book ID"
+//           value={bookId}
+//           onChange={(e) => setBookId(e.target.value)}
+//         />
+//         <button onClick={handleCancelBook}>Cancel Book</button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default BorrowPage;
+
+// 'use client';
+// import React, { useState } from "react";
+
+// // Define types for the API request and response
+// type BorrowRequestDTO = {
+//   borrowId: string;
+//   userId: string;
+//   borrowDate: string;
+//   returnDate: string;
+//   bookList: string[];
+// };
+
+// type BorrowBooksResponse = {
+//   message?: string;
+//   borrowId?: string;
+//   [key: string]: unknown; // For additional properties from the server
+// };
+
+// const BorrowBooksPage: React.FC = () => {
+//   const [userId, setUserId] = useState("");
+//   const [borrowId, setBorrowId] = useState("");
+//   const [borrowDate, setBorrowDate] = useState("");
+//   const [returnDate, setReturnDate] = useState("");
+//   const [bookList, setBookList] = useState([{ bookId: "" }]);
+//   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+//   const handleBookChange = (index: number, value: string) => {
+//     const updatedBooks = [...bookList];
+//     updatedBooks[index].bookId = value;
+//     setBookList(updatedBooks);
+//   };
+
+//   const addBookField = () => {
+//     setBookList([...bookList, { bookId: "" }]);
+//   };
+
+//   const removeBookField = (index: number) => {
+//     const updatedBooks = bookList.filter((_, i) => i !== index);
+//     setBookList(updatedBooks);
+//   };
+
+//   const validateForm = () => {
+//     // Ensure all fields are filled in
+//     if (!borrowId || !userId || !borrowDate || !returnDate || bookList.some((book) => !book.bookId)) {
+//       setStatusMessage("Please fill in all the fields and add valid books.");
+//       return false;
+//     }
+//     return true;
+//   };
+
+//   const handleBorrowBooks = async () => {
+//     if (!validateForm()) return;
+  
+//     // Convert dates to string format (YYYY-MM-DD)
+//     const formatDate = (date: string) => {
+//       const d = new Date(date);
+//       return d.toISOString().split('T')[0]; // Extract only the date part (YYYY-MM-DD)
+//     };
+  
+//     const requestPayload: BorrowRequestDTO = {
+//       borrowId,
+//       userId,
+//       borrowDate: formatDate(borrowDate),  // Format date as string
+//       returnDate: formatDate(returnDate),  // Format date as string
+//       bookList: bookList.map(book => book.bookId)
+//     };
+  
+//     console.log("Request Payload:", JSON.stringify(requestPayload, null, 2)); // Log the request payload
+  
+//     try {
+//       const response = await fetch(`http://localhost:5259/api/borrow/${userId}`, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(requestPayload),
+//       });
+  
+//       const result: BorrowBooksResponse = await response.json();
+  
+//       console.log("Server Response:", result); // Log server response for debugging
+  
+//       if (!response.ok) {
+//         setStatusMessage(`Error: ${result.message || "Unknown error occurred."}`);
+//         return;
+//       }
+  
+//       setStatusMessage(`Success: Borrow order created with ID ${result.borrowId}`);
+//     } catch (error) {
+//       setStatusMessage((error as Error).message);
+//     }
+//   };
+  
+
+//   return (
+//     <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
+//       <h1>Borrow Books</h1>
+
+//       <div style={{ marginBottom: "15px" }}>
+//         <label>
+//           Borrow ID:
+//           <input
+//             type="text"
+//             value={borrowId}
+//             onChange={(e) => setBorrowId(e.target.value)}
+//             style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
+//           />
+//         </label>
+//       </div>
+
+//       <div style={{ marginBottom: "15px" }}>
+//         <label>
+//           User ID:
+//           <input
+//             type="text"
+//             value={userId}
+//             onChange={(e) => setUserId(e.target.value)}
+//             style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
+//           />
+//         </label>
+//       </div>
+
+//       <div style={{ marginBottom: "15px" }}>
+//         <label>
+//           Borrow Date:
+//           <input
+//             type="date"
+//             value={borrowDate}
+//             onChange={(e) => setBorrowDate(e.target.value)}
+//             style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
+//           />
+//         </label>
+//       </div>
+
+//       <div style={{ marginBottom: "15px" }}>
+//         <label>
+//           Return Date:
+//           <input
+//             type="date"
+//             value={returnDate}
+//             onChange={(e) => setReturnDate(e.target.value)}
+//             style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
+//           />
+//         </label>
+//       </div>
+
+//       <div>
+//         <h3>Book List</h3>
+//         {bookList.map((book, index) => (
+//           <div key={index} style={{ display: "flex", marginBottom: "10px" }}>
+//             <input
+//               type="text"
+//               value={book.bookId}
+//               onChange={(e) => handleBookChange(index, e.target.value)}
+//               placeholder="Book ID"
+//               style={{ flex: 1, padding: "8px", marginRight: "5px" }}
+//             />
+//             <button
+//               type="button"
+//               onClick={() => removeBookField(index)}
+//               style={{
+//                 backgroundColor: "#FF5555",
+//                 color: "#FFF",
+//                 border: "none",
+//                 padding: "5px 10px",
+//                 cursor: "pointer",
+//               }}
+//             >
+//               Remove
+//             </button>
+//           </div>
+//         ))}
+//         <button
+//           type="button"
+//           onClick={addBookField}
+//           style={{
+//             padding: "10px",
+//             backgroundColor: "#007BFF",
+//             color: "#FFF",
+//             border: "none",
+//             cursor: "pointer",
+//           }}
+//         >
+//           Add Book
+//         </button>
+//       </div>
+
+//       <button
+//         onClick={handleBorrowBooks}
+//         style={{
+//           marginTop: "20px",
+//           padding: "10px 20px",
+//           backgroundColor: "#007BFF",
+//           color: "#FFF",
+//           border: "none",
+//           borderRadius: "5px",
+//           cursor: "pointer",
+//         }}
+//       >
+//         Submit Borrow Request
+//       </button>
+
+//       {statusMessage && (
+//         <p
+//           style={{
+//             marginTop: "20px",
+//             padding: "10px",
+//             backgroundColor: statusMessage.startsWith("Error") ? "#FFDDDD" : "#DDFFDD",
+//             color: statusMessage.startsWith("Error") ? "#FF0000" : "#008000",
+//             border: `1px solid ${statusMessage.startsWith("Error") ? "#FF0000" : "#008000"}`,
+//             borderRadius: "5px",
+//           }}
+//         >
+//           {statusMessage}
+//         </p>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default BorrowBooksPage;
+
