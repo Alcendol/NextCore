@@ -18,7 +18,7 @@ namespace auth.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(RegisterDto dto) {
+        public IActionResult Register(RegisterDTO dto) {
             var user = new User
             {
                 userId = dto.userId, // Nanti isinya pake NIK, jangan generate
@@ -35,7 +35,7 @@ namespace auth.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login(LoginDto dto) {
+        public IActionResult Login(LoginDTO dto) {
             var user = _repository.GetByEmail(dto.userEmail);
             if (user == null) return BadRequest(new {message= "Invalid Credentials"});
             if (!BCrypt.Net.BCrypt.Verify(dto.password, user.password))
@@ -52,7 +52,7 @@ namespace auth.Controllers
 
             return Ok(
                 new{
-                    message = "succes"
+                    message = "success"
                 }
             );
         }

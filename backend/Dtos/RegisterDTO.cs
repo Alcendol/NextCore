@@ -1,6 +1,6 @@
 namespace auth.Dtos
 {
-    public class RegisterDto
+    public class RegisterDTO
     {
         public int userId{get; set;} // Nanti isinya pake NIK, jangan generate
         public required string firstName{get; set;}
