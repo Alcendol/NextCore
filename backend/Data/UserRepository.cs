@@ -13,8 +13,7 @@ namespace auth.Data
         public User Create(User user)
         {
             _context.Users.Add(user);
-            user.userId = _context.SaveChanges();
-
+            _context.SaveChanges();
             return user;
         }
         
@@ -23,7 +22,7 @@ namespace auth.Data
             return _context.Users.FirstOrDefault(u => u.userEmail == email);
         }
 
-        public User GetById(int userId)
+        public User GetById(string userId)
         {
             return _context.Users.FirstOrDefault(u => u.userId == userId);
         }

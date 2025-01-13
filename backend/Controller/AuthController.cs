@@ -18,7 +18,23 @@ namespace auth.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(RegisterDto dto) {
+        public async Task<IActionResult> Register([FromForm]RegisterDto dto) {
+            if (dto.imageKtp == null || dto.imageKtp.Length == 0)
+                return BadRequest("KTP image is required.");
+
+            // Save the uploaded file
+            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + dto.imageKtp.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            // Create directory if it doesn't exist
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await dto.imageKtp.CopyToAsync(fileStream);
+            }
             var user = new User
             {
                 userId = dto.userId, // Nanti isinya pake NIK, jangan generate
@@ -27,11 +43,13 @@ namespace auth.Controllers
                 userEmail = dto.userEmail,
                 userPhone = dto.userPhone,
                 password = BCrypt.Net.BCrypt.HashPassword(dto.password),
-                imageKtp = dto.imageKtp,
+                imageKtpPath = Path.Combine("uploads", uniqueFileName),
                 role = dto.role,
             };
 
-            return Created("success", _repository.Create(user));
+            _repository.Create(user);
+
+            return Created("success", new { message = "User registered successfully." });
         }
 
         [HttpPost("login")]
@@ -65,7 +83,7 @@ namespace auth.Controllers
 
                 var token = _jwtService.Verify(jwt);
 
-                int userId = int.Parse(token.Issuer);
+                string userId = token.Issuer;
 
                 var user = _repository.GetById(userId);
 
