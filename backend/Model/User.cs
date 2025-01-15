@@ -10,7 +10,6 @@ namespace auth.Models {
         public required string userPhone{get; set;}
         [JsonIgnore] public string password {get; set;}
         public required string imageKtpPath { get; set; } // Path or URL to the image
-        public required string role{get; set;}
 
         public ICollection<Account> accounts { get; set; }
         public ICollection<Session> sessions { get; set; }

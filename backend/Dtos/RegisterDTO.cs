@@ -9,6 +9,5 @@ namespace auth.Dtos
         public required string userPhone{get; set;}
         public string password{get; set;}
         public required IFormFile imageKtp{get; set;}
-        public required string role{get; set;}
     }
 }

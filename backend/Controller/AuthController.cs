@@ -44,7 +44,6 @@ namespace auth.Controllers
                 userPhone = dto.userPhone,
                 password = BCrypt.Net.BCrypt.HashPassword(dto.password),
                 imageKtpPath = Path.Combine("uploads", uniqueFileName),
-                role = dto.role,
             };
 
             _repository.Create(user);

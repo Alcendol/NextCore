@@ -2,7 +2,7 @@
 
 import React, { SyntheticEvent, useState, useEffect } from "react";
 import Link from "next/link";
-import { IoEyeSharp, IoLogoGoogle, IoPersonSharp } from "react-icons/io5";
+import {IoLogoGoogle, IoPersonSharp } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 
 const SignupPage = () => {
@@ -14,7 +14,7 @@ const SignupPage = () => {
   const [userPhone, setUserPhone] = useState("");
   const [password, setPassword] = useState("");
   const [imageKtp, setImageKtp] = useState<File | null>(null);
-  const [role, setRole] = useState("member");
+  const [loading, setLoading] = useState<boolean>(false); 
 
   const router = useRouter();
 
@@ -38,10 +38,9 @@ const SignupPage = () => {
     formData.append("userPhone", userPhone);
     formData.append("password", password);
     formData.append("imageKtp", imageKtp);  // Fixed the issue here: imageKtp instead of fileInput.files[0]
-    formData.append("role", role);
-
+    setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
+      const response = await fetch(`http://localhost:5259/api/register`, {
         method: "POST",
         body: formData,
       });
@@ -49,12 +48,13 @@ const SignupPage = () => {
       if (!response.ok) {
         throw new Error(`Error: ${response.status} - ${response.statusText}`);
       }
-
-      alert("Registration successful!");
+      await response.json();
+      setLoading(false);
       router.push("/signin");
     } catch (error) {
       console.error("Registration error:", error);
       alert("Registration failed. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -121,8 +121,9 @@ const SignupPage = () => {
               <button
                 type="submit"
                 className="w-full py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+                disabled={loading}
               >
-                Sign up
+                {loading? "Loading..." : "Sign up"}
               </button>
             </div>
             <p className="text-gray-800 text-sm !mt-8 text-center">Or</p>

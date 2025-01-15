@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { IoPersonSharp, IoEyeSharp, IoLogoGoogle } from "react-icons/io5";
+import { IoPersonSharp, IoEyeSharp } from "react-icons/io5";
 import Link from "next/link";
 import Image from "next/image";
-import { signIn, useSession } from "next-auth/react";
 
 const SigninPage = () => {
     const [email, setEmail] = useState("");
@@ -114,12 +113,12 @@ const SigninPage = () => {
                                     Sign in
                                 </button>
                             </div>
-                            <p className="text-gray-800 text-sm !mt-8 text-center">Don't have an account? 
+                            <p className="text-gray-800 text-sm !mt-8 text-center">Dont have an account? 
                                 <Link href="/signup" className="text-blue-600 hover:underline ml-1 whitespace-nowrap font-semibold">Register here
                                 </Link>
                             </p>
                         </form>
-                        <div className="!mt-8">
+                        {/* <div className="!mt-8">
                             <button
                                 type="button"
                                 onClick={() => signIn("google")}
@@ -128,7 +127,7 @@ const SigninPage = () => {
                                 <IoLogoGoogle className="mr-5" />
                                 Sign in with Google
                             </button>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
