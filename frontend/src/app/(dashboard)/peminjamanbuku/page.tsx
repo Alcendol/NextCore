@@ -3,6 +3,7 @@
 import Search from "@/components/search"
 import Card from "@/components/card"
 import { useEffect, useState } from 'react'
+import SortingBuku from "../components/sorting";
 
 interface Book {
     bookId: string;
@@ -64,62 +65,69 @@ const PeminjamanBukuPage: React.FC = () => {
 
   return (
     <div className="my-10">
-        <div className="px-6">
+        <div className="lg:px-6 ">
           <Search />
         </div>
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {!loading && books.length === 0 && <p>No books available.</p>}
-        <div className="grid grid-cols-1 gap-4"> 
-            {currentBooks.map((book) => (
-              <Card
-                key={book.bookId}
-                bookId={book.bookId}
-                title={book.title}
-                desc={book.desc}
-                genre={typeof book.genre === "string" ? book.genre.split(",") : book.genre}
-                datePublished={book.datePublished}
-                authorName={book.authorName}
-              />
-            ))}
+        <div className="h-full flex">
+          <div className="w-0 md:w-1/4">
+            <SortingBuku />
+          </div>
+          <div className="w-full md:w-3/4">
+            {loading && <p>Loading...</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            {!loading && books.length === 0 && <p>No books available.</p>}
+            <div className="grid grid-cols-1 gap-4"> 
+                {currentBooks.map((book) => (
+                  <Card
+                    key={book.bookId}
+                    bookId={book.bookId}
+                    title={book.title}
+                    desc={book.desc}
+                    genre={typeof book.genre === "string" ? book.genre.split(",") : book.genre}
+                    datePublished={book.datePublished}
+                    authorName={book.authorName}
+                  />
+                ))}
+            </div>
+          </div>
         </div>
-      {totalPages > 1 && (
-      <div className="flex justify-center mt-6">
-        <nav className="inline-flex -space-x-px">
-          <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-l-lg border border-gray-300 bg-white text-sm font-medium ${
-                  currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                Previous
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${
-                  page === currentPage
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+        {totalPages > 1 && (
+        <div className="flex justify-center mt-6">
+          <nav className="inline-flex -space-x-px">
             <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={`px-4 py-2 rounded-r-lg border border-gray-300 bg-white text-sm font-medium ${
-                currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              Next
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 rounded-l-lg border border-gray-300 bg-white text-sm font-medium ${
+                    currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  Previous
             </button>
-          </nav>
-        </div>
-    )}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${
+                    page === currentPage
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 rounded-r-lg border border-gray-300 bg-white text-sm font-medium ${
+                  currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Next
+              </button>
+            </nav>
+          </div>
+      )}
     </div>
   )
 }

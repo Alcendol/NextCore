@@ -45,7 +45,7 @@ const AuthorPage: React.FC = () => {
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentBooks = authors.slice(indexOfFirstItem, indexOfLastItem);
+    const currentAuthors = authors.slice(indexOfFirstItem, indexOfLastItem);
   
     const totalPages = Math.ceil(authors.length / itemsPerPage);
   
@@ -57,7 +57,7 @@ const AuthorPage: React.FC = () => {
         <div>
             <div className='p-4 mt-20'>
                 <div className="w-full flex justify-end">
-                    <Link href="/admindashboard/book/create">
+                    <Link href="/admindashboard/author/create">
                         <button className="bg-blue-600 h-14 rounded-lg hover:bg-blue-800">
                             <span className="w-full text-white p-5">Create New Data</span>
                         </button>
@@ -87,18 +87,30 @@ const AuthorPage: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentBooks.map((author) => (
+                        {currentAuthors.map((author) => (
                             <tr key={author.authorId} className="bg-gray-100 hover:bg-gray-200">
                                 <td className="px-4 py-2 border border-gray-300">{author.authorId}</td>
                                 <td className="px-4 py-2 border border-gray-300">{author.authorName}</td>
                                 <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{author.authorEmail}</td>
                                 <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{author.authorPhone}</td>
-                                <td className="px-4 py-2 border border-gray-300 flex justify-center">
-                                    <Link href={`/admindashboard/author/${author.authorId}`}>
-                                    <button className="bg-blue-600 h-14 rounded-lg hover:bg-blue-800">
-                                        <span className="w-full text-white p-5">View</span>
-                                    </button>
-                                    </Link>
+                                <td className="py-2 border border-gray-300">
+                                    <div className="block text-center 2xl:flex justify-center gap-2">
+                                        <Link href={`/admindashboard/author/view/${author.authorId}`}>
+                                        <button className="bg-blue-600 w-20 m-2 py-2 rounded-lg hover:bg-blue-800">
+                                            <span className="text-white text-sm">View</span>
+                                        </button>
+                                        </Link>
+                                        <Link href={`/admindashboard/author/update/${author.authorId}`}>
+                                        <button className="bg-yellow-400 w-20 m-2 py-2 rounded-lg hover:bg-yellow-500">
+                                            <span className="text-white text-sm">Update</span>
+                                        </button>
+                                        </Link>
+                                        <Link href={``}>
+                                        <button className="bg-red-600 w-20 py-2 m-2 rounded-lg hover:bg-red-700">
+                                            <span className="text-white text-sm">Delete</span>
+                                        </button>
+                                        </Link>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
