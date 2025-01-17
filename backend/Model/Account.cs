@@ -1,4 +1,4 @@
-namespace auth.Models {
+namespace NextCore.backend.Models {
     public class Account
     {
         public int id { get; set; }

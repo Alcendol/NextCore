@@ -1,4 +1,4 @@
-namespace auth.Dtos
+namespace NextCore.backend.Dtos
 {
     public class RegisterDTO
     {

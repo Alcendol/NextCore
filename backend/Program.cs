@@ -1,5 +1,6 @@
-using auth.Data;
-using auth.Helpers;
+using NextCore.backend.Repositories;
+using NextCore.backend.Helpers;
+using NextCore.backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using MySqlConnector;

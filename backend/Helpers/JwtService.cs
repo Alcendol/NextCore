@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace auth.Helpers
+namespace NextCore.backend.Helpers
 {
     public class JwtService
     {

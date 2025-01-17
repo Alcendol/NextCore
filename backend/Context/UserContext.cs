@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using auth.Models;
+using NextCore.backend.Models;
 
-namespace auth.Data{
+namespace NextCore.backend.Context{
     public class UserContext: DbContext
     {
         public UserContext(DbContextOptions<UserContext> options) : base(options)

@@ -1,6 +1,7 @@
-using auth.Models;
+using NextCore.backend.Models;
+using NextCore.backend.Context;
 
-namespace auth.Data
+namespace NextCore.backend.Repositories
 {
     public class UserRepository: IUserRepository
     {

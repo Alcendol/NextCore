@@ -72,7 +72,7 @@ public class BorrowController : ControllerBase
                                 pendingBooks = reader.GetInt32(4),
                                 borrowedBooks = reader.GetInt32(5),
                                 returnedBooks = reader.GetInt32(6),
-                                status = reader.GetString(7)
+                                status = Enum.TryParse<BorrowApproval>(reader.GetString(7), out var status) ? status : BorrowApproval.Pending
                             };
                             BorrowList.Add(borrow);
                         }

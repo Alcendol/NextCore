@@ -1,7 +1,7 @@
-using auth.Data;
-using auth.Dtos;
-using auth.Helpers;
-using auth.Models;
+using NextCore.backend.Repositories;
+using NextCore.backend.Dtos;
+using NextCore.backend.Helpers;
+using NextCore.backend.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace auth.Controllers

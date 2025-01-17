@@ -1,6 +1,6 @@
-using auth.Models;
+using NextCore.backend.Models;
 
-namespace auth.Data
+namespace NextCore.backend.Repositories
 {
     public interface IUserRepository 
     {

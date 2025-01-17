@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace auth.Models {
+namespace NextCore.backend.Models {
     public class User
     {
         public required string userId{get; set;} // Nanti isinya pake NIK, jangan generate
