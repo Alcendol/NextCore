@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
@@ -12,11 +12,30 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [message, setMessage] = useState('');
+  useEffect(() => {
+    (
+      async () => {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
+            credentials: 'include'
+          });
+  
+          const content = await response.json();
+  
+          setMessage(`Hi ${content.userEmail}`);
+        }
+        catch(e) { 
+          setMessage(`You are not logged in`);
+        }
+      }
+    )
+  })
   return (
     <>
       
       {/* Main Content Section */}
-      <main className="">{children}</main>
+      <main className="">{message}{children}</main>
     </>
   );
 }

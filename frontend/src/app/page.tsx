@@ -1,104 +1,104 @@
-import Image from "next/image";
+// import Image from "next/image";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+// export default function Home() {
+//   return (
+//     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+//       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+//         <Image
+//           className="dark:invert"
+//           src="/next.svg"
+//           alt="Next.js logo"
+//           width={180}
+//           height={38}
+//           priority
+//         />
+//         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
+//           <li className="mb-2">
+//             Get started by editing{" "}
+//             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
+//               src/app/page.tsx
+//             </code>
+//             .
+//           </li>
+//           <li>Save and see your changes instantly.</li>
+//         </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
-}
+//         <div className="flex gap-4 items-center flex-col sm:flex-row">
+//           <a
+//             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
+//             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+//             target="_blank"
+//             rel="noopener noreferrer"
+//           >
+//             <Image
+//               className="dark:invert"
+//               src="/vercel.svg"
+//               alt="Vercel logomark"
+//               width={20}
+//               height={20}
+//             />
+//             Deploy now
+//           </a>
+//           <a
+//             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
+//             href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+//             target="_blank"
+//             rel="noopener noreferrer"
+//           >
+//             Read our docs
+//           </a>
+//         </div>
+//       </main>
+//       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
+//         <a
+//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+//           href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+//           target="_blank"
+//           rel="noopener noreferrer"
+//         >
+//           <Image
+//             aria-hidden
+//             src="/file.svg"
+//             alt="File icon"
+//             width={16}
+//             height={16}
+//           />
+//           Learn
+//         </a>
+//         <a
+//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+//           href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+//           target="_blank"
+//           rel="noopener noreferrer"
+//         >
+//           <Image
+//             aria-hidden
+//             src="/window.svg"
+//             alt="Window icon"
+//             width={16}
+//             height={16}
+//           />
+//           Examples
+//         </a>
+//         <a
+//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+//           href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+//           target="_blank"
+//           rel="noopener noreferrer"
+//         >
+//           <Image
+//             aria-hidden
+//             src="/globe.svg"
+//             alt="Globe icon"
+//             width={16}
+//             height={16}
+//           />
+//           Go to nextjs.org →
+//         </a>
+//       </footer>
+//     </div>
+//   );
+// }
 
 
 
@@ -490,225 +490,209 @@ export default function Home() {
 
 // export default BorrowPage;
 
-// 'use client';
-// import React, { useState } from "react";
+'use client';
+import React, { useState } from "react";
 
-// // Define types for the API request and response
-// type BorrowRequestDTO = {
-//   borrowId: string;
-//   userId: string;
-//   borrowDate: string;
-//   returnDate: string;
-//   bookList: string[];
-// };
+// Define types for the API request and response
+type BorrowRequestDTO = {
+  userId: string;
+  borrowDate: string;
+  returnDate: string;
+  bookList: string[];
+};
 
-// type BorrowBooksResponse = {
-//   message?: string;
-//   borrowId?: string;
-//   [key: string]: unknown; // For additional properties from the server
-// };
+type BorrowBooksResponse = {
+  message?: string;
+  [key: string]: unknown; // For additional properties from the server
+};
 
-// const BorrowBooksPage: React.FC = () => {
-//   const [userId, setUserId] = useState("");
-//   const [borrowId, setBorrowId] = useState("");
-//   const [borrowDate, setBorrowDate] = useState("");
-//   const [returnDate, setReturnDate] = useState("");
-//   const [bookList, setBookList] = useState([{ bookId: "" }]);
-//   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+const BorrowBooksPage: React.FC = () => {
+  const [userId, setUserId] = useState("");
+  const [borrowDate, setBorrowDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+  const [bookList, setBookList] = useState([{ bookId: "" }]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-//   const handleBookChange = (index: number, value: string) => {
-//     const updatedBooks = [...bookList];
-//     updatedBooks[index].bookId = value;
-//     setBookList(updatedBooks);
-//   };
+  const handleBookChange = (index: number, value: string) => {
+    const updatedBooks = [...bookList];
+    updatedBooks[index].bookId = value;
+    setBookList(updatedBooks);
+  };
 
-//   const addBookField = () => {
-//     setBookList([...bookList, { bookId: "" }]);
-//   };
+  const addBookField = () => {
+    setBookList([...bookList, { bookId: "" }]);
+  };
 
-//   const removeBookField = (index: number) => {
-//     const updatedBooks = bookList.filter((_, i) => i !== index);
-//     setBookList(updatedBooks);
-//   };
+  const removeBookField = (index: number) => {
+    const updatedBooks = bookList.filter((_, i) => i !== index);
+    setBookList(updatedBooks);
+  };
 
-//   const validateForm = () => {
-//     // Ensure all fields are filled in
-//     if (!borrowId || !userId || !borrowDate || !returnDate || bookList.some((book) => !book.bookId)) {
-//       setStatusMessage("Please fill in all the fields and add valid books.");
-//       return false;
-//     }
-//     return true;
-//   };
+  const validateForm = () => {
+    // Ensure all fields are filled in
+    if (!userId || !borrowDate || !returnDate || bookList.some((book) => !book.bookId)) {
+      setStatusMessage("Please fill in all the fields and add valid books.");
+      return false;
+    }
+    return true;
+  };
 
-//   const handleBorrowBooks = async () => {
-//     if (!validateForm()) return;
+  const handleBorrowBooks = async () => {
+    if (!validateForm()) return;
   
-//     // Convert dates to string format (YYYY-MM-DD)
-//     const formatDate = (date: string) => {
-//       const d = new Date(date);
-//       return d.toISOString().split('T')[0]; // Extract only the date part (YYYY-MM-DD)
-//     };
+    // Convert dates to string format (YYYY-MM-DD)
+    const formatDate = (date: string) => {
+      const d = new Date(date);
+      return d.toISOString().split('T')[0]; // Extract only the date part (YYYY-MM-DD)
+    };
   
-//     const requestPayload: BorrowRequestDTO = {
-//       borrowId,
-//       userId,
-//       borrowDate: formatDate(borrowDate),  // Format date as string
-//       returnDate: formatDate(returnDate),  // Format date as string
-//       bookList: bookList.map(book => book.bookId)
-//     };
+    const requestPayload: BorrowRequestDTO = {
+      userId,
+      borrowDate: formatDate(borrowDate),  // Format date as string
+      returnDate: formatDate(returnDate),  // Format date as string
+      bookList: bookList.map(book => book.bookId)
+    };
   
-//     console.log("Request Payload:", JSON.stringify(requestPayload, null, 2)); // Log the request payload
+    console.log("Request Payload:", JSON.stringify(requestPayload, null, 2)); // Log the request payload
   
-//     try {
-//       const response = await fetch(`http://localhost:5259/api/borrow/${userId}`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(requestPayload),
-//       });
+    try {
+      const response = await fetch(`http://localhost:5259/api/borrow/${userId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestPayload),
+      });
   
-//       const result: BorrowBooksResponse = await response.json();
+      const result: BorrowBooksResponse = await response.json();
   
-//       console.log("Server Response:", result); // Log server response for debugging
+      console.log("Server Response:", result); // Log server response for debugging
   
-//       if (!response.ok) {
-//         setStatusMessage(`Error: ${result.message || "Unknown error occurred."}`);
-//         return;
-//       }
+      if (!response.ok) {
+        setStatusMessage(`Error: ${result.message || "Unknown error occurred."}`);
+        return;
+      }
   
-//       setStatusMessage(`Success: Borrow order created with ID ${result.borrowId}`);
-//     } catch (error) {
-//       setStatusMessage((error as Error).message);
-//     }
-//   };
+      setStatusMessage(`Success: Borrow order created with ID ${result.borrowId}`);
+    } catch (error) {
+      setStatusMessage((error as Error).message);
+    }
+  };
   
 
-//   return (
-//     <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
-//       <h1>Borrow Books</h1>
+  return (
+    <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
+      <h1>Borrow Books</h1>
 
-//       <div style={{ marginBottom: "15px" }}>
-//         <label>
-//           Borrow ID:
-//           <input
-//             type="text"
-//             value={borrowId}
-//             onChange={(e) => setBorrowId(e.target.value)}
-//             style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
-//           />
-//         </label>
-//       </div>
+      <div style={{ marginBottom: "15px" }}>
+        <label>
+          User ID:
+          <input
+            type="text"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
+          />
+        </label>
+      </div>
 
-//       <div style={{ marginBottom: "15px" }}>
-//         <label>
-//           User ID:
-//           <input
-//             type="text"
-//             value={userId}
-//             onChange={(e) => setUserId(e.target.value)}
-//             style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
-//           />
-//         </label>
-//       </div>
+      <div style={{ marginBottom: "15px" }}>
+        <label>
+          Borrow Date:
+          <input
+            type="date"
+            value={borrowDate}
+            onChange={(e) => setBorrowDate(e.target.value)}
+            style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
+          />
+        </label>
+      </div>
 
-//       <div style={{ marginBottom: "15px" }}>
-//         <label>
-//           Borrow Date:
-//           <input
-//             type="date"
-//             value={borrowDate}
-//             onChange={(e) => setBorrowDate(e.target.value)}
-//             style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
-//           />
-//         </label>
-//       </div>
+      <div style={{ marginBottom: "15px" }}>
+        <label>
+          Return Date:
+          <input
+            type="date"
+            value={returnDate}
+            onChange={(e) => setReturnDate(e.target.value)}
+            style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
+          />
+        </label>
+      </div>
 
-//       <div style={{ marginBottom: "15px" }}>
-//         <label>
-//           Return Date:
-//           <input
-//             type="date"
-//             value={returnDate}
-//             onChange={(e) => setReturnDate(e.target.value)}
-//             style={{ display: "block", width: "100%", padding: "8px", margin: "5px 0" }}
-//           />
-//         </label>
-//       </div>
+      <div>
+        <h3>Book List</h3>
+        {bookList.map((book, index) => (
+          <div key={index} style={{ display: "flex", marginBottom: "10px" }}>
+            <input
+              type="text"
+              value={book.bookId}
+              onChange={(e) => handleBookChange(index, e.target.value)}
+              placeholder="Book ID"
+              style={{ flex: 1, padding: "8px", marginRight: "5px" }}
+            />
+            <button
+              type="button"
+              onClick={() => removeBookField(index)}
+              style={{
+                backgroundColor: "#FF5555",
+                color: "#FFF",
+                border: "none",
+                padding: "5px 10px",
+                cursor: "pointer",
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addBookField}
+          style={{
+            padding: "10px",
+            backgroundColor: "#007BFF",
+            color: "#FFF",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Add Book
+        </button>
+      </div>
 
-//       <div>
-//         <h3>Book List</h3>
-//         {bookList.map((book, index) => (
-//           <div key={index} style={{ display: "flex", marginBottom: "10px" }}>
-//             <input
-//               type="text"
-//               value={book.bookId}
-//               onChange={(e) => handleBookChange(index, e.target.value)}
-//               placeholder="Book ID"
-//               style={{ flex: 1, padding: "8px", marginRight: "5px" }}
-//             />
-//             <button
-//               type="button"
-//               onClick={() => removeBookField(index)}
-//               style={{
-//                 backgroundColor: "#FF5555",
-//                 color: "#FFF",
-//                 border: "none",
-//                 padding: "5px 10px",
-//                 cursor: "pointer",
-//               }}
-//             >
-//               Remove
-//             </button>
-//           </div>
-//         ))}
-//         <button
-//           type="button"
-//           onClick={addBookField}
-//           style={{
-//             padding: "10px",
-//             backgroundColor: "#007BFF",
-//             color: "#FFF",
-//             border: "none",
-//             cursor: "pointer",
-//           }}
-//         >
-//           Add Book
-//         </button>
-//       </div>
+      <button
+        onClick={handleBorrowBooks}
+        style={{
+          marginTop: "20px",
+          padding: "10px 20px",
+          backgroundColor: "#007BFF",
+          color: "#FFF",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
+        Submit Borrow Request
+      </button>
 
-//       <button
-//         onClick={handleBorrowBooks}
-//         style={{
-//           marginTop: "20px",
-//           padding: "10px 20px",
-//           backgroundColor: "#007BFF",
-//           color: "#FFF",
-//           border: "none",
-//           borderRadius: "5px",
-//           cursor: "pointer",
-//         }}
-//       >
-//         Submit Borrow Request
-//       </button>
+      {statusMessage && (
+        <p
+          style={{
+            marginTop: "20px",
+            padding: "10px",
+            backgroundColor: statusMessage.startsWith("Error") ? "#FFDDDD" : "#DDFFDD",
+            color: statusMessage.startsWith("Error") ? "#FF0000" : "#008000",
+            border: `1px solid ${statusMessage.startsWith("Error") ? "#FF0000" : "#008000"}`,
+            borderRadius: "5px",
+          }}
+        >
+          {statusMessage}
+        </p>
+      )}
+    </div>
+  );
+};
 
-//       {statusMessage && (
-//         <p
-//           style={{
-//             marginTop: "20px",
-//             padding: "10px",
-//             backgroundColor: statusMessage.startsWith("Error") ? "#FFDDDD" : "#DDFFDD",
-//             color: statusMessage.startsWith("Error") ? "#FF0000" : "#008000",
-//             border: `1px solid ${statusMessage.startsWith("Error") ? "#FF0000" : "#008000"}`,
-//             borderRadius: "5px",
-//           }}
-//         >
-//           {statusMessage}
-//         </p>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default BorrowBooksPage;
+export default BorrowBooksPage;
 

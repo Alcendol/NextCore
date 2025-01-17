@@ -41,7 +41,8 @@ public class BorrowController : ControllerBase
                         br.returnDate,
                         COUNT(CASE WHEN bw.status = 'Pending' THEN 1 END) AS pendingBooks,
                         COUNT(CASE WHEN bw.status = 'Borrowed' THEN 1 END) AS borrowedBooks,
-                        COUNT(CASE WHEN bw.status = 'Returned' THEN 1 END) AS returnedBooks
+                        COUNT(CASE WHEN bw.status = 'Returned' THEN 1 END) AS returnedBooks,
+                        br.status
                     FROM 
                         borrows br
                     JOIN
@@ -70,11 +71,12 @@ public class BorrowController : ControllerBase
                                 returnDate = reader.GetDateTime(3),
                                 pendingBooks = reader.GetInt32(4),
                                 borrowedBooks = reader.GetInt32(5),
-                                returnedBooks = reader.GetInt32(6)
+                                returnedBooks = reader.GetInt32(6),
+                                status = reader.GetString(7)
                             };
                             BorrowList.Add(borrow);
                         }
-                        _logger.LogDebug("Books successfully fetched.");
+                        _logger.LogDebug("Borrows List successfully fetched.");
                         return Ok(BorrowList); // Return the list of books
                     }
                 }
@@ -173,9 +175,12 @@ public class BorrowController : ControllerBase
                 // Step 1: Validate stock for each book
                 List<string> validBooks = new List<string>();
                 string stockQuery = @"
-                    SELECT stock
-                    FROM books
-                    WHERE bookId = @bookId
+                    SELECT 
+                        stock
+                    FROM 
+                        books
+                    WHERE 
+                        bookId = @bookId
                 ";
 
                 using (var stockCommand = new MySqlCommand(stockQuery, connection))
@@ -205,28 +210,48 @@ public class BorrowController : ControllerBase
                     return BadRequest(new { Message = "Books are out of stock" });
                 }
 
-                // Step 2: Insert into `borrow` table
+                int borrowCounts = 0;
+                string borrowCountsQuery = @"
+                    SELECT 
+                        COUNT(*)
+                    FROM 
+                        borrows
+                    WHERE
+                        userId = @userId
+                ";
+
+                using (var borrowCountsCommand = new MySqlCommand(borrowCountsQuery, connection)){
+                    borrowCountsCommand.Parameters.AddWithValue("@userId", userId);
+                    borrowCounts = Convert.ToInt32(borrowCountsCommand.ExecuteScalar());
+                }
+
+                // Step 2: Insert into `borrow` table   
+                string borrowId = borrow.userId + "-" + DateTime.Today.ToString("d") + "-" + borrowCounts.ToString();
+                _logger.LogDebug(borrowId);
                 string borrowQuery = @"
                     INSERT INTO borrows (
                         borrowId, 
                         userId, 
-                        borrowDate, 
-                        returnDate
+                        duration,
+                        status,
+                        created_at
                     )
                     VALUES (
                         @borrowId, 
                         @userId, 
-                        @borrowDate, 
-                        @returnDate
+                        @duration,
+                        @status,
+                        @createdAt
                     )
                 ";
-
-                using (var borrowCommand = new MySqlCommand(borrowQuery, connection))
-                {
-                    borrowCommand.Parameters.AddWithValue("@borrowId", borrow.borrowId);
+                
+                // var createdAt = DateTime.Parse(DateTime.Today.ToString("d"));
+                using (var borrowCommand = new MySqlCommand(borrowQuery, connection)){
+                    borrowCommand.Parameters.AddWithValue("@borrowId", borrowId);
                     borrowCommand.Parameters.AddWithValue("@userId", borrow.userId);
-                    borrowCommand.Parameters.AddWithValue("@borrowDate", borrow.borrowDate);
-                    borrowCommand.Parameters.AddWithValue("@returnDate", borrow.returnDate);
+                    borrowCommand.Parameters.AddWithValue("@duration", borrow.duration);
+                    borrowCommand.Parameters.AddWithValue("@status", 'Pending');
+                    borrowCommand.Parameters.AddWithValue("@createdAt", DateTime.Today);
                     borrowCommand.ExecuteNonQuery();
                 }
 
@@ -251,7 +276,7 @@ public class BorrowController : ControllerBase
                     foreach (var book in validBooks)
                     {
                         borrowedBookCommand.Parameters.Clear();
-                        borrowedBookCommand.Parameters.AddWithValue("@borrowId", borrow.borrowId);
+                        borrowedBookCommand.Parameters.AddWithValue("@borrowId", borrowId);
                         borrowedBookCommand.Parameters.AddWithValue("@bookId", book);
                         borrowedBookCommand.Parameters.AddWithValue("@returnDate", DBNull.Value); // Default to NULL
                         borrowedBookCommand.Parameters.AddWithValue("@status", BorrowStatus.Pending.ToString());

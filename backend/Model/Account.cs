@@ -10,7 +10,7 @@ namespace auth.Models {
         public DateTime expiresAt { get; set; } // Expiration of the access token
         public string scope { get; set; } // OAuth scope
 
-        public int userId { get; set; } // Foreign key to User
+        public required string userId { get; set; } // Foreign key to User
         public User user { get; set; }
     }
 }

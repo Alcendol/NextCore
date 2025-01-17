@@ -1,18 +1,17 @@
 using auth.Data;
 using auth.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using MySqlConnector;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:3001") 
+        policy.WithOrigins("http://nextcore.test") 
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials());
-    
-    
 });
 
 
@@ -44,5 +43,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowFrontend"); 
 app.UseRouting();
 app.MapControllers();  
+
+app.UseStaticFiles();
 
 app.Run();

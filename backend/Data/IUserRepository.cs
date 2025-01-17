@@ -6,6 +6,6 @@ namespace auth.Data
     {
         User Create(User user);
         User GetByEmail(string email);
-        User GetById(int userId);
+        User GetById(string userId);
     }
 }

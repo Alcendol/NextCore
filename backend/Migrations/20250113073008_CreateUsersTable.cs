@@ -19,8 +19,8 @@ namespace NextCore.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    userId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    userId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     firstName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     lastName = table.Column<string>(type: "longtext", nullable: false)
@@ -31,7 +31,8 @@ namespace NextCore.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     password = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    imageKtp = table.Column<byte[]>(type: "longblob", nullable: true),
+                    imageKtpPath = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     role = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -60,16 +61,15 @@ namespace NextCore.Migrations
                     expiresAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     scope = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    userId = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    userId1 = table.Column<int>(type: "int", nullable: false)
+                    userId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Accounts", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Accounts_Users_userId1",
-                        column: x => x.userId1,
+                        name: "FK_Accounts_Users_userId",
+                        column: x => x.userId,
                         principalTable: "Users",
                         principalColumn: "userId",
                         onDelete: ReferentialAction.Cascade);
@@ -85,7 +85,8 @@ namespace NextCore.Migrations
                     sessionToken = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     expires = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    userId = table.Column<int>(type: "int", nullable: false)
+                    userId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -100,9 +101,9 @@ namespace NextCore.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Accounts_userId1",
+                name: "IX_Accounts_userId",
                 table: "Accounts",
-                column: "userId1");
+                column: "userId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_userId",

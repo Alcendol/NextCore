@@ -59,14 +59,11 @@ namespace NextCore.Migrations
 
                     b.Property<string>("userId")
                         .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("userId1")
-                        .HasColumnType("int");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("id");
 
-                    b.HasIndex("userId1");
+                    b.HasIndex("userId");
 
                     b.ToTable("Accounts");
                 });
@@ -86,8 +83,9 @@ namespace NextCore.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("userId")
-                        .HasColumnType("int");
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("id");
 
@@ -98,18 +96,16 @@ namespace NextCore.Migrations
 
             modelBuilder.Entity("auth.Models.User", b =>
                 {
-                    b.Property<int>("userId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("userId"));
+                    b.Property<string>("userId")
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("firstName")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<byte[]>("imageKtp")
-                        .HasColumnType("longblob");
+                    b.Property<string>("imageKtpPath")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("lastName")
                         .IsRequired()
@@ -143,7 +139,7 @@ namespace NextCore.Migrations
                 {
                     b.HasOne("auth.Models.User", "user")
                         .WithMany("accounts")
-                        .HasForeignKey("userId1")
+                        .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
