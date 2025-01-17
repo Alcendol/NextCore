@@ -250,7 +250,7 @@ public class BorrowController : ControllerBase
                     borrowCommand.Parameters.AddWithValue("@borrowId", borrowId);
                     borrowCommand.Parameters.AddWithValue("@userId", borrow.userId);
                     borrowCommand.Parameters.AddWithValue("@duration", borrow.duration);
-                    borrowCommand.Parameters.AddWithValue("@status", 'Pending');
+                    borrowCommand.Parameters.AddWithValue("@status", BorrowApproval.Pending.ToString());
                     borrowCommand.Parameters.AddWithValue("@createdAt", DateTime.Today);
                     borrowCommand.ExecuteNonQuery();
                 }

@@ -1,4 +1,4 @@
-﻿public class BookDTO{
+﻿public class BookResponseDTO{
     public required string bookId {get; set;} // Nanti isinya pake isbn, jangan generate
     public required string authorName {get; set;}
     public required string publisherName {get; set;}
