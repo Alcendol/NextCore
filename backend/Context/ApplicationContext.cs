@@ -23,10 +23,76 @@ namespace NextCore.backend.Context
         {
             modelBuilder.Entity<Book>(entity => {
                 entity.HasKey(b => b.bookId);
+
+                entity.HasMany(a => a.Authorships)
+                    .WithOne(a => a.Book)
+                    .HasForeignKey(a => a.bookId);
+
+                entity.HasMany(a => a.BooksPublished)
+                    .WithOne(a => a.Book)
+                    .HasForeignKey(a => a.bookId);
+
+                entity.HasMany(a => a.BookGenres)
+                    .WithOne(a => a.book)
+                    .HasForeignKey(a => a.bookId);
             });
 
             modelBuilder.Entity<Author>(entity => {
                 entity.HasKey(a => a.authorId);
+
+                entity.HasMany(a => a.Authorships)
+                    .WithOne(at => at.Author)
+                    .HasForeignKey(at => at.authorId);
+            });
+
+            modelBuilder.Entity<Authorship>(entity =>{
+                entity.HasKey(a => a.authorshipId);
+
+                entity.HasOne(a => a.Author)
+                    .WithMany(a => a.Authorships)
+                    .HasForeignKey(a => a.authorId);
+
+                entity.HasOne(a => a.Book)
+                    .WithMany(a => a.Authorships)
+                    .HasForeignKey(a => a.bookId);
+            });
+
+            modelBuilder.Entity<Publisher>(entity => {
+                entity.HasKey(a => a.publisherId);
+
+                entity.HasMany(a => a.BooksPublished)
+                    .WithOne(at => at.publisher)
+                    .HasForeignKey(at => at.publisherId);
+            });
+
+            modelBuilder.Entity<BookPublished>(entity => {
+                entity.HasKey(a => a.bookPublishedId);
+
+                entity.HasOne(a => a.publisher)
+                    .WithMany(a => a.BooksPublished)
+                    .HasForeignKey(a => a.publisherId);
+
+                entity.HasOne(a => a.Book)
+                    .WithMany(a => a.BooksPublished)
+                    .HasForeignKey(a => a.bookId);
+            });
+
+            modelBuilder.Entity<Genre>(entity => {
+                entity.HasKey(a => a.genreId);
+
+                entity.HasMany(a => a.bookGenres)
+                    .WithOne(a => a.genre)
+                    .HasForeignKey(a => a.genreId);
+            });
+
+            modelBuilder.Entity<BookGenre>(entity => {
+                entity.HasOne(a => a.book)
+                    .WithMany(a => a.BookGenres)
+                    .HasForeignKey(a => a.bookId);
+
+                entity.HasOne(a => a.genre)
+                    .WithMany(a => a.bookGenres)
+                    .HasForeignKey(a => a.genreId);
             });
 
             modelBuilder.Entity<Cart>(entity => {
@@ -35,7 +101,8 @@ namespace NextCore.backend.Context
 
             modelBuilder.Entity<CartDetail>(entity =>
             {
-                entity.HasKey(cd => new {cd.cartId, cd.bookId});    
+                entity.HasKey(cd => new {cd.cartId, cd.bookId});   
+
                 // Configure the relationship with Cart
                 entity.HasOne(c => c.Cart)
                     .WithMany(cd => cd.CartDetails) // A Cart can have many CartDetails

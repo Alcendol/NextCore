@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-
+using NextCore.backend.Models;
 [Route("api/book")]
 [ApiController]
 public class BookController : ControllerBase
@@ -88,7 +88,7 @@ public class BookController : ControllerBase
                                 country = reader.IsDBNull(6) ? null : reader.GetString(6),
                                 language = reader.IsDBNull(7) ? null : reader.GetString(7),
                                 genre = reader.GetString(8),
-                                desc = reader.GetString(9),
+                                description = reader.GetString(9),
                                 image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"], 
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
@@ -177,7 +177,7 @@ public class BookController : ControllerBase
                                 country = reader.IsDBNull(6) ? null : reader.GetString(6),
                                 language = reader.IsDBNull(7) ? null : reader.GetString(7),
                                 genre = reader.GetString(8),
-                                desc = reader.GetString(9),
+                                description = reader.GetString(9),
                                 image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"], 
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
@@ -274,7 +274,7 @@ public class BookController : ControllerBase
                                 country = reader.IsDBNull(6) ? "" : reader.GetString(6),
                                 language = reader.IsDBNull(7) ? "" : reader.GetString(7),
                                 genre = reader.IsDBNull(8) ? "" : reader.GetString(8),
-                                desc = reader.GetString(9),
+                                description = reader.GetString(9),
                                 image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
@@ -369,7 +369,7 @@ public class BookController : ControllerBase
                                 country = reader.IsDBNull(6) ? "" : reader.GetString(6),
                                 language = reader.IsDBNull(7) ? "" : reader.GetString(7),
                                 genre = reader.IsDBNull(8) ? "" : reader.GetString(8),
-                                desc = reader.GetString(9),
+                                description = reader.GetString(9),
                                 image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
@@ -463,7 +463,7 @@ public class BookController : ControllerBase
                                 country = reader.IsDBNull(6) ? null : reader.GetString(6),
                                 language = reader.IsDBNull(7) ? null : reader.GetString(7),
                                 genre = reader.GetString(8),
-                                desc = reader.GetString(9),
+                                description = reader.GetString(9),
                                 image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
@@ -485,7 +485,7 @@ public class BookController : ControllerBase
     }
 
     [HttpPost("single")]
-    public IActionResult AddSingleBook(Book book)
+    public IActionResult AddSingleBook(BookRequestDTO book)
     {
         _logger.LogDebug("Adding a single book to the library.");
 
@@ -596,7 +596,7 @@ public class BookController : ControllerBase
                     var authorIds = new List<int>();
                     using (var fetchIdsCommand = new MySqlCommand(fetchAuthorIdsQuery, connection, transaction))
                     {
-                        fetchIdsCommand.CommandText = fetchAuthorIdsQuery.Replace("@author", string.Join(",", book.authorName.Select(g => $"'{g}'")));
+                        fetchIdsCommand.CommandText = fetchAuthorIdsQuery.Replace("@author", string.Join(",", book.authorNames.Select(g => $"'{g}'")));
                         using (var reader = fetchIdsCommand.ExecuteReader())
                         {
                             while (reader.Read())
@@ -629,7 +629,7 @@ public class BookController : ControllerBase
                         string insertPublishersQuery = "INSERT INTO publishers (publisherName) VALUES (@publisherName)";
                         using (var insertCommand = new MySqlCommand(insertPublishersQuery, connection, transaction))
                         {
-                            foreach (var author in newPublishers)
+                            foreach (var publisher in newPublishers)
                             {
                                 insertCommand.Parameters.Clear();
                                 insertCommand.Parameters.AddWithValue("@publisherName", publisher);
@@ -639,7 +639,7 @@ public class BookController : ControllerBase
                     }
 
                     // Fetch all publisherId for the book's booksPublished
-                    string fetchPublisherIdQuery = @"
+                    string fetchPublisherIdsQuery = @"
                         SELECT publisherId FROM publishers WHERE publisherName IN (@publisher)";
                     var publisherIds = new List<int>();
                     using (var fetchIdsCommand = new MySqlCommand(fetchPublisherIdsQuery, connection, transaction))
