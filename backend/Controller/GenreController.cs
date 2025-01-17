@@ -23,7 +23,7 @@ public class GenreController : ControllerBase
     [HttpGet]
     public ActionResult<List<Genre>> Index()
     {
-        _logger.LogDebug("Fetching all books from the database.");
+        _logger.LogDebug("Fetching all genres from the database.");
 
         try
         {
@@ -64,110 +64,67 @@ public class GenreController : ControllerBase
             }
 
             _logger.LogDebug("Genres successfully fetched.");
-            return Ok(GenresList); // Return the list of books
+            return Ok(GenresList);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred while fetching books.");
+            _logger.LogError(ex, "Error occurred while fetching genres.");
             return StatusCode(500, "Internal server error");
         }
     }
 
-    // [HttpPost("single")]
-    // public IActionResult AddSingleBook(Book book)
-    // {
-    //     _logger.LogDebug("Adding a single book to the library.");
+    [HttpGet("by-genreid/{genreId}")]
+    public ActionResult<Genre> getGenreByGenreId(string genreId){
+        _logger.LogDebug("Fetching genre by genreId from the database.");
 
-    //     book.country ??= "";
-    //     book.language ??= "";
+        try
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
+            _logger.LogDebug("Connection string retrieved.");
 
-    //     try
-    //     {
-    //         var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-    //         using (var connection = new MySqlConnection(connectionString))
-    //         {
-    //             connection.Open();
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                _logger.LogDebug("Database connection opened.");
 
-    //             string query = @"INSERT INTO books 
-    //                             (bookId, title, datePublished, totalPage, country, language, genre, description) 
-    //                             VALUES 
-    //                             (@bookId, @title, @datePublished, @totalPage, @country, @language, @genre, @desc)";
-                                
-    //             using (var command = new MySqlCommand(query, connection))
-    //             {
-    //                 command.Parameters.AddWithValue("@bookId", book.bookId);
-    //                 command.Parameters.AddWithValue("@title", book.title);
-    //                 command.Parameters.AddWithValue("@datePublished", book.datePublished);
-    //                 command.Parameters.AddWithValue("@totalPage", book.totalPage);
-    //                 command.Parameters.AddWithValue("@country", book.country);
-    //                 command.Parameters.AddWithValue("@language", book.language);
-    //                 command.Parameters.AddWithValue("@genre", book.genre);
-    //                 command.Parameters.AddWithValue("@desc", book.desc);
+                string query = @"
+                    SELECT 
+                        g.genreId,
+                        g.genreName
+                    FROM 
+                        genres g
+                    WHERE 
+                        g.genreId = @genreId
+                ";
+                _logger.LogDebug("Executing query: {Query}", query);
 
-    //                 command.ExecuteNonQuery();
-    //             }
-    //         }
-
-    //         _logger.LogDebug("Book successfully added.");
-    //         return Ok(book);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Error occurred while adding a single book.");
-    //         return StatusCode(500, "Internal server error.");
-    //     }
-    // }
-
-    // [HttpPost("multiple")]
-    // public IActionResult AddMultipleBooks(List<Book> bookList)
-    // {
-    //     _logger.LogDebug("Adding multiple books to the library.");
-
-    //     foreach (var book in bookList)
-    //     {
-    //         book.country ??= "";
-    //         book.language ??= "";
-    //     }
-
-    //     try
-    //     {
-    //         var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-    //         using (var connection = new MySqlConnection(connectionString))
-    //         {
-    //             connection.Open();
-
-    //             string query = @"INSERT INTO books 
-    //                             (bookId, title, datePublished, totalPage, country, language, genre, description) 
-    //                             VALUES 
-    //                             (@bookId, @title, @datePublished, @totalPage, @country, @language, @genre, @desc)";
-                                
-    //             using (var command = new MySqlCommand(query, connection))
-    //             {
-    //                 foreach (var book in bookList)
-    //                 {
-    //                     command.Parameters.Clear();
-    //                     command.Parameters.AddWithValue("@bookId", book.bookId);
-    //                     command.Parameters.AddWithValue("@title", book.title);
-    //                     command.Parameters.AddWithValue("@datePublished", book.datePublished);
-    //                     command.Parameters.AddWithValue("@totalPage", book.totalPage);
-    //                     command.Parameters.AddWithValue("@country", book.country);
-    //                     command.Parameters.AddWithValue("@language", book.language);
-    //                     command.Parameters.AddWithValue("@genre", book.genre);
-    //                     command.Parameters.AddWithValue("@desc", book.desc);
-
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //         }
-
-    //         _logger.LogDebug("Books successfully added.");
-    //         return Ok(bookList);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Error occurred while adding multiple books.");
-    //         return StatusCode(500, "Internal server error.");
-    //     }
-    // }
-
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@genreId", genreId);
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        _logger.LogDebug("Query executed successfully. Reading data...");
+                        if(reader.Read())
+                        {    GenreDTO genre = new GenreDTO
+                            {
+                                genreId = reader.GetString(0),
+                                genreName = reader.GetString(1),    
+                            };
+                            _logger.LogDebug("Genre fetched successfully");
+                            return Ok(genre);
+                        }
+                        else{
+                            _logger.LogWarning("No genre found with the given id: {genreId}", genreId);
+                            return NotFound("Genre not found.");
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while fetching genres.");
+            return StatusCode(500, "Internal server error");
+        }
+    }
 }

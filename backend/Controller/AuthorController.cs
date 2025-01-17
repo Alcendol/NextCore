@@ -77,101 +77,62 @@ public class AuthorController : ControllerBase
         }
     }
 
-    // [HttpPost("single")]
-    // public IActionResult AddSingleBook(Book book)
-    // {
-    //     _logger.LogDebug("Adding a single book to the library.");
+    [HttpGet("by-authorid/{authorId}")]
+    public ActionResult<Author> getAuthorByAuthorId(string authorId){
+        _logger.LogDebug("Fetching author by authorId from the database.");
 
-    //     book.country ??= "";
-    //     book.language ??= "";
+        try
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
+            _logger.LogDebug("Connection string retrieved.");
 
-    //     try
-    //     {
-    //         var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-    //         using (var connection = new MySqlConnection(connectionString))
-    //         {
-    //             connection.Open();
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                _logger.LogDebug("Database connection opened.");
 
-    //             string query = @"INSERT INTO books 
-    //                             (bookId, title, datePublished, totalPage, country, language, genre, description) 
-    //                             VALUES 
-    //                             (@bookId, @title, @datePublished, @totalPage, @country, @language, @genre, @desc)";
-                                
-    //             using (var command = new MySqlCommand(query, connection))
-    //             {
-    //                 command.Parameters.AddWithValue("@bookId", book.bookId);
-    //                 command.Parameters.AddWithValue("@title", book.title);
-    //                 command.Parameters.AddWithValue("@datePublished", book.datePublished);
-    //                 command.Parameters.AddWithValue("@totalPage", book.totalPage);
-    //                 command.Parameters.AddWithValue("@country", book.country);
-    //                 command.Parameters.AddWithValue("@language", book.language);
-    //                 command.Parameters.AddWithValue("@genre", book.genre);
-    //                 command.Parameters.AddWithValue("@desc", book.desc);
+                string query = @"
+                    SELECT 
+                        a.authorId,
+                        a.authorName,
+                        a.authorEmail,
+                        a.authorPhone
+                    FROM 
+                        authors a
+                    WHERE 
+                        a.authorId = @authorId
+                ";
+                _logger.LogDebug("Executing query: {Query}", query);
 
-    //                 command.ExecuteNonQuery();
-    //             }
-    //         }
-
-    //         _logger.LogDebug("Book successfully added.");
-    //         return Ok(book);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Error occurred while adding a single book.");
-    //         return StatusCode(500, "Internal server error.");
-    //     }
-    // }
-
-    // [HttpPost("multiple")]
-    // public IActionResult AddMultipleBooks(List<Book> bookList)
-    // {
-    //     _logger.LogDebug("Adding multiple books to the library.");
-
-    //     foreach (var book in bookList)
-    //     {
-    //         book.country ??= "";
-    //         book.language ??= "";
-    //     }
-
-    //     try
-    //     {
-    //         var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-    //         using (var connection = new MySqlConnection(connectionString))
-    //         {
-    //             connection.Open();
-
-    //             string query = @"INSERT INTO books 
-    //                             (bookId, title, datePublished, totalPage, country, language, genre, description) 
-    //                             VALUES 
-    //                             (@bookId, @title, @datePublished, @totalPage, @country, @language, @genre, @desc)";
-                                
-    //             using (var command = new MySqlCommand(query, connection))
-    //             {
-    //                 foreach (var book in bookList)
-    //                 {
-    //                     command.Parameters.Clear();
-    //                     command.Parameters.AddWithValue("@bookId", book.bookId);
-    //                     command.Parameters.AddWithValue("@title", book.title);
-    //                     command.Parameters.AddWithValue("@datePublished", book.datePublished);
-    //                     command.Parameters.AddWithValue("@totalPage", book.totalPage);
-    //                     command.Parameters.AddWithValue("@country", book.country);
-    //                     command.Parameters.AddWithValue("@language", book.language);
-    //                     command.Parameters.AddWithValue("@genre", book.genre);
-    //                     command.Parameters.AddWithValue("@desc", book.desc);
-
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //         }
-
-    //         _logger.LogDebug("Books successfully added.");
-    //         return Ok(bookList);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Error occurred while adding multiple books.");
-    //         return StatusCode(500, "Internal server error.");
-    //     }
-    // }
-
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@authorId", authorId);
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        _logger.LogDebug("Query executed successfully. Reading data...");
+                        if(reader.Read())
+                        {    AuthorDTO author = new AuthorDTO
+                            {
+                                authorId = reader.GetString(0),
+                                authorName = reader.GetString(1),
+                                authorEmail = reader.GetString(2),
+                                authorPhone = reader.GetString(3),
+                            };
+                            _logger.LogDebug("Author fetched successfully");
+                            return Ok(author);
+                        }
+                        else{
+                            _logger.LogWarning("No author found with the given id: {authorId}", authorId);
+                            return NotFound("Author not found.");
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while fetching books.");
+            return StatusCode(500, "Internal server error");
+        }
+    }
 }

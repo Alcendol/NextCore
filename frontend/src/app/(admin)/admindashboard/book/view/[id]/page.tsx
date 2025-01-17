@@ -70,8 +70,8 @@ const ViewPageBook: React.FC = () => {
             {book && (
                 <div className="w-full max-h-full mb-5 flex flex-col lg:flex-row justify-between items-start">
                     <div className="bg-white border border-gray-400 p-4 w-full">
-                        <label htmlFor="bookId" className="block text-sm text-gray-700 font-sans mb-2">
-                            Book ID:
+                        <label htmlFor="ISBN" className="block text-sm text-gray-700 font-sans mb-2">
+                            ISBN:
                         </label>
                         <input
                             id="bookId"
@@ -111,7 +111,7 @@ const ViewPageBook: React.FC = () => {
                             className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                         />
                         <label htmlFor="publisherName" className="block text-sm text-gray-700 font-sans mt-4 mb-2">
-                            Published Name:
+                            Publisher Name:
                         </label>
                         <input
                             id="publisherName"
@@ -121,22 +121,12 @@ const ViewPageBook: React.FC = () => {
                             className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                         />
                         <label htmlFor="totalPage" className="block text-sm text-gray-700 font-sans mt-4 mb-2">
-                            Total Page:
+                            Total Pages:
                         </label>
                         <input
                             id="totalPage"
-                            type="text"
+                            type="number"
                             value={book.totalPage}
-                            disabled
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-                        />
-                        <label htmlFor="country" className="block text-sm text-gray-700 font-sans mt-4 mb-2">
-                            Country:
-                        </label>
-                        <input
-                            id="country"
-                            type="text"
-                            value={book.country}
                             disabled
                             className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                         />
@@ -144,7 +134,7 @@ const ViewPageBook: React.FC = () => {
                             Genre:
                         </label>
                         <input
-                            id="totalPage"
+                            id="genre"
                             type="text"
                             value={book.genre}
                             disabled
