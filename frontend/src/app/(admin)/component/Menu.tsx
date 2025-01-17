@@ -22,20 +22,8 @@ const menuEBook = [
       title: "Input Data E-Book",
       items: [
         {
-          label: "Author",
-          href: "/admindashboard/author",
-        },
-        {
-          label: "Book",
+          label: "E-Book",
           href: "/admindashboard/ebook",
-        },
-        {
-          label: "Publishers",
-          href: "/admindashboard/publisher",
-        },
-        {
-          label: "Genre",
-          href: "/admindashboard/genre",
         },
       ],
     },
@@ -46,24 +34,32 @@ const menuInputData = [
     title: "Input Data Peminjaman Buku",
     items: [
       {
-        label: "Author",
-        href: "/admindashboard/author",
-      },
-      {
         label: "Book",
         href: "/admindashboard/book",
+      }
+    ],
+  },
+];
+
+const menuInputLain = [
+  {
+    title: "Input Data Lain-Lain",
+    items: [
+      {
+        label: "Author",
+        href: "/admindashboard/author"
       },
       {
         label: "Publishers",
-        href: "/admindashboard/publisher",
+        href: "/admindashboard/publishers",
       },
       {
         label: "Genre",
         href: "/admindashboard/genre",
-      },
-    ],
-  },
-];
+      }
+    ]
+  }
+]
 
 const Menu = () => {
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
@@ -99,7 +95,7 @@ const Menu = () => {
                             <Link
                             href={item.href}
                             key={item.label}
-                            className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2"
+                            className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 hover:bg-gray-300"
                             >
                             <span className="hidden lg:block">{item.label}</span>
                             </Link>
@@ -130,7 +126,7 @@ const Menu = () => {
                             <Link
                             href={item.href}
                             key={item.label}
-                            className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2"
+                            className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 hover:bg-gray-300"
                             >
                             <span className="hidden lg:block">{item.label}</span>
                             </Link>
@@ -161,7 +157,7 @@ const Menu = () => {
                             <Link
                                 href={item.href}
                                 key={item.label}
-                                className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2"
+                                className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 hover:bg-gray-300"
                                 >
                                 <span className="hidden lg:block">{item.label}</span>
                             </Link>
@@ -170,6 +166,45 @@ const Menu = () => {
                 )}
             </div>
         ))}
+
+        {menuInputLain.map((menu) => (
+            <div className="flex flex-col gap-2" key={menu.title}>
+                <div className="flex justify-between items-center" onClick={() => handleMenuClick(menu.title)}>
+                    <span
+                        className="hidden lg:block text-gray-400 my-4 cursor-pointer font-sans font-bold">
+                        {menu.title}
+                    </span>
+                    <span
+                        className={`transition-transform duration-300 cursor-pointer ${
+                        openMenus[menu.title] ? "rotate-90" : "rotate-0"
+                        }`}
+                        >
+                        <IoCaretForward className="w-3 h-3" />
+                    </span>
+                </div>
+                {openMenus[menu.title] && (
+                    <div className="flex flex-col pl-6">
+                        {menu.items.map((item) => (
+                            <Link
+                                href={item.href}
+                                key={item.label}
+                                className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 hover:bg-gray-300"
+                                >
+                                <span className="hidden lg:block">{item.label}</span>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </div>
+        ))}
+        <div className="flex flex-col">
+          <Link
+              href={"/logout"}
+              className="lg:justify-start gap-4 text-gray-500 py-2"
+              >
+              <span className="hidden lg:block font-sans text-gray-400 font-bold">Logout</span>
+          </Link>
+        </div>
     </div>
   );
 };

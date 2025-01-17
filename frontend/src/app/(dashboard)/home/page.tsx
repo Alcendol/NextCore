@@ -2,10 +2,14 @@ import Image from "next/image"
 import Search from "@/components/search"
 import Card from "@/components/card"
 import LittleCard from "@/components/littlecard"
+import Link from "next/link"
 
 const HomePage = () => {
     return (
         <div className="container mx-auto mt-32 pb-5 mb-32">
+            <Link href="/admindashboard" className="mt-10 text-blue-500 hover:text-blue-700 hover:underline">
+                Ke Admin
+            </Link>
             <div className="mt-32 mb-32">
                 <span className="flex justify-center font-bold text-3xl font-sans text-gray-700 hover:underline mb-5">Peminjaman Buku</span>
                 <Search />

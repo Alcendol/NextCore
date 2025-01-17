@@ -6,28 +6,22 @@ import { useEffect, useState } from "react"
 import { IoAlertCircleSharp, IoAddCircle, } from "react-icons/io5";
 
 
-interface Book {
-    bookId: string;
-    title: string;
+interface Author {
+    authorId: string;
     authorName: string;
-    publisherName: string;
-    datePublished: string;
-    totalPage: number;
-    country: string;
-    language: string;
-    genre: string;
-    desc: string;
+    authorEmail: string;
+    authorPhone: string;
 }
 
-const BookPage: React.FC = () => {
-    const [books, setBooks] = useState<Book[]>([]);
+const AuthorPage: React.FC = () => {
+    const [authors, setAuthors] = useState<Author[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 20;
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/book`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/author`)
           .then((response) => {
             if (!response.ok) {
               return response.text().then((text) => {
@@ -38,7 +32,7 @@ const BookPage: React.FC = () => {
           })
           .then((data) => {
             console.log('Fetched data:', data);
-            setBooks(data);
+            setAuthors(data);
             setLoading(false);
           })
           .catch((error) => {
@@ -51,9 +45,9 @@ const BookPage: React.FC = () => {
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentBooks = books.slice(indexOfFirstItem, indexOfLastItem);
+    const currentBooks = authors.slice(indexOfFirstItem, indexOfLastItem);
   
-    const totalPages = Math.ceil(books.length / itemsPerPage);
+    const totalPages = Math.ceil(authors.length / itemsPerPage);
   
     const handlePageChange = (page: number) => {
       setCurrentPage(page);
@@ -75,52 +69,38 @@ const BookPage: React.FC = () => {
             </div>
             <div className="w-full px-4 py-2">
                 <div className="flex justify-start">
-                    <span className="font-sans text-2xl">Data Buku yang sudah di input</span>
+                    <span className="font-sans text-2xl">Data Author yang sudah di input</span>
                 </div>
             </div>
             {loading && <p>Loading...</p>}
             {error && <p style={{ color: "red" }}>{error}</p>}
-            {!loading && books.length === 0 && <p>No books available.</p>}
+            {!loading && authors.length === 0 && <p>No books available.</p>}
             <div className="w-full p-4">
                 <table className="table-auto w-full border-collapse border border-gray-200 shadow-lg">
                     <thead>
                         <tr className="bg-blue-500 text-white text-center">
-                            <th className="px-4 py-2 border border-gray-300 rounded-tl-lg">Id Buku</th>
-                            <th className="px-4 py-2 border border-gray-300">Judul</th>
-                            <th className="hidden md:table-cell px-4 py-2 border border-gray-300">Tanggal Rilis</th>
-                            <th className="hidden md:table-cell px-4 py-2 border border-gray-300">Genre</th>
-                            <th className="hidden md:table-cell px-4 py-2 border border-gray-300 ">Penulis</th>
+                            <th className="px-4 py-2 border border-gray-300 rounded-tl-lg">Id Author</th>
+                            <th className="px-4 py-2 border border-gray-300">Nama Author</th>
+                            <th className="hidden md:table-cell px-4 py-2 border border-gray-300">Email Author</th>
+                            <th className="hidden md:table-cell px-4 py-2 border border-gray-300">Nomor Handphone</th>
                             <th className="px-4 py-2 border border-gray-300 rounded-tr-lg">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {currentBooks.map((book) => (
-                            <tr key={book.bookId} className="bg-gray-100 hover:bg-gray-200">
-                            <td className="px-4 py-2 border border-gray-300">{book.bookId}</td>
-                            <td className="px-4 py-2 border border-gray-300">{book.title}</td>
-                            <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{book.datePublished}</td>
-                            <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{book.genre}</td>
-                            <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{book.authorName}</td>
-                            <td className="py-2 border border-gray-300">
-                              <div className="block text-center 2xl:flex justify-center gap-2">
-                                <Link href={`/admindashboard/book/view/${book.bookId}`}>
-                                  <button className="bg-blue-600 w-20 m-2 py-2 rounded-lg hover:bg-blue-800">
-                                    <span className="text-white text-sm">View</span>
-                                  </button>
-                                </Link>
-                                <Link href={`/admindashboard/book/update/${book.bookId}`}>
-                                  <button className="bg-yellow-400 w-20 m-2 py-2 rounded-lg hover:bg-yellow-500">
-                                    <span className="text-white text-sm">Update</span>
-                                  </button>
-                                </Link>
-                                <Link href={``}>
-                                  <button className="bg-red-600 w-20 py-2 m-2 rounded-lg hover:bg-red-700">
-                                    <span className="text-white text-sm">Delete</span>
-                                  </button>
-                                </Link>
-                              </div>
-                            </td>
-                          </tr>                          
+                        {currentBooks.map((author) => (
+                            <tr key={author.authorId} className="bg-gray-100 hover:bg-gray-200">
+                                <td className="px-4 py-2 border border-gray-300">{author.authorId}</td>
+                                <td className="px-4 py-2 border border-gray-300">{author.authorName}</td>
+                                <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{author.authorEmail}</td>
+                                <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{author.authorPhone}</td>
+                                <td className="px-4 py-2 border border-gray-300 flex justify-center">
+                                    <Link href={`/admindashboard/author/${author.authorId}`}>
+                                    <button className="bg-blue-600 h-14 rounded-lg hover:bg-blue-800">
+                                        <span className="w-full text-white p-5">View</span>
+                                    </button>
+                                    </Link>
+                                </td>
+                            </tr>
                         ))}
                     </tbody>
                 </table>
@@ -166,4 +146,4 @@ const BookPage: React.FC = () => {
     )
 }
 
-export default BookPage
+export default AuthorPage

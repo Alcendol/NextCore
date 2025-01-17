@@ -96,31 +96,19 @@ const BookPage: React.FC = () => {
                     <tbody>
                         {currentBooks.map((book) => (
                             <tr key={book.bookId} className="bg-gray-100 hover:bg-gray-200">
-                            <td className="px-4 py-2 border border-gray-300">{book.bookId}</td>
-                            <td className="px-4 py-2 border border-gray-300">{book.title}</td>
-                            <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{book.datePublished}</td>
-                            <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{book.genre}</td>
-                            <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{book.authorName}</td>
-                            <td className="py-2 border border-gray-300">
-                              <div className="block text-center 2xl:flex justify-center gap-2">
-                                <Link href={`/admindashboard/book/view/${book.bookId}`}>
-                                  <button className="bg-blue-600 w-20 m-2 py-2 rounded-lg hover:bg-blue-800">
-                                    <span className="text-white text-sm">View</span>
-                                  </button>
-                                </Link>
-                                <Link href={`/admindashboard/book/update/${book.bookId}`}>
-                                  <button className="bg-yellow-400 w-20 m-2 py-2 rounded-lg hover:bg-yellow-500">
-                                    <span className="text-white text-sm">Update</span>
-                                  </button>
-                                </Link>
-                                <Link href={``}>
-                                  <button className="bg-red-600 w-20 py-2 m-2 rounded-lg hover:bg-red-700">
-                                    <span className="text-white text-sm">Delete</span>
-                                  </button>
-                                </Link>
-                              </div>
-                            </td>
-                          </tr>                          
+                                <td className="px-4 py-2 border border-gray-300">{book.bookId}</td>
+                                <td className="px-4 py-2 border border-gray-300">{book.title}</td>
+                                <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{book.datePublished}</td>
+                                <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{book.genre}</td>
+                                <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{book.authorName}</td>
+                                <td className="px-4 py-2 border border-gray-300 flex justify-center">
+                                    <Link href={`/admindashboard/book/${book.bookId}`}>
+                                    <button className="bg-blue-600 h-14 rounded-lg hover:bg-blue-800">
+                                        <span className="w-full text-white p-5">View</span>
+                                    </button>
+                                    </Link>
+                                </td>
+                            </tr>
                         ))}
                     </tbody>
                 </table>
