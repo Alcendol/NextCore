@@ -126,8 +126,8 @@ public class BookController : ControllerBase
                 string query = @"
                     SELECT 
                         b.bookId, 
-                        GROUP_CONCAT(DISTINCT a.authorName SEPARATOR ', ') AS authorName, 
-                        p.publisherName, 
+                        GROUP_CONCAT(DISTINCT a.authorName SEPARATOR ', ') AS authorName,
+                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName, 
                         b.title, 
                         b.datePublished,
                         b.totalPage, 
@@ -409,7 +409,7 @@ public class BookController : ControllerBase
                     SELECT 
                         b.bookId, 
                         GROUP_CONCAT(DISTINCT a.authorName SEPARATOR ', ') AS authorName,
-                        p.publisherName, 
+                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
                         b.title, 
                         b.datePublished, 
                         b.totalPage, 
@@ -483,6 +483,7 @@ public class BookController : ControllerBase
             return StatusCode(500, "Internal server error");
         }
     }
+
 
     // [HttpPost("single")]
     // public IActionResult AddSingleBook(Book book)

@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import AnimatedScreen from "@/components/animated-screen";
 
 
-export default function DashboardLayout({
+export default function SingInLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
