@@ -1,5 +1,6 @@
-public class Genre{
-    public required string genreId {get; set;} // PK
-    public required string genreName {get; set;} 
-
+namespace NextCore.backend.Models{
+    public class Genre{
+        public required string genreId {get; set;} // PK
+        public required string genreName {get; set;} 
+    }
 }

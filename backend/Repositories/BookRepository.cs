@@ -1,7 +1,10 @@
+using NextCore.backend.Repositories;
+using NextCore.backend.DbContext;
+using NextCore.backend.Models;
 public class BookRepository : IBookRepository {
-    private readonly DatabaseContext _context; // Assumed database context
+    private readonly ApplicationContext _context; 
 
-    public BookRepository(DatabaseContext context) {
+    public BookRepository(ApplicationContext context) {
         _context = context;
     }
 
@@ -13,20 +16,20 @@ public class BookRepository : IBookRepository {
         return await _context.Books.FindAsync(bookId);
     }
 
-    public async Task<IEnumerable<Book>> GetBookByAuthorId(string authorId){
-        
+    public async Task<IEnumerable<Book>> GetBooksByAuthorId(string authorId){
+        return;
     }
 
-    public async Task<IEnumerable<Book>> GetBookByPublisherId(string publisherId){
-
+    public async Task<IEnumerable<Book>> GetBooksByPublisherId(string publisherId){
+        return;
     }
 
-    public async Task<IEnumerable<Book>> GetBookByGenreId(string genreId){
-
+    public async Task<IEnumerable<Book>> GetBooksByGenreId(string genreId){
+        return;
     }
 
-    public async Task <List<Book>> AddBooks(List<bookRequestDTO> books){
-
+    public async Task <List<Book>> AddBooks(List<BookRequestDTO> books){
+        return;
     }
 
 }
