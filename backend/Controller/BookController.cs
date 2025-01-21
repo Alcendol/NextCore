@@ -100,7 +100,7 @@ public class BookController : ControllerBase
             }
 
             _logger.LogDebug("Books successfully fetched.");
-            return Ok(BooksList); // Return the list of books
+            return Ok(BooksList);
         }
         catch (Exception ex)
         {
@@ -485,7 +485,7 @@ public class BookController : ControllerBase
     }
 
     [HttpPost("single")]
-    public IActionResult AddSingleBook(BookRequestDTO book)
+    public IActionResult AddSingleBook([FromForm] BookRequestDTO book)
     {
         _logger.LogDebug("Adding a single book to the library.");
 
@@ -726,7 +726,16 @@ public class BookController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while adding a single book.");
-            return StatusCode(500, "Internal server error.");
+            
+            // Return detailed error message with field information
+            var errorResponse = new
+            {
+                message = "Internal server error.",
+                error = ex.Message,
+                stackTrace = ex.StackTrace
+            };
+
+            return StatusCode(500, errorResponse);
         }
     }
 

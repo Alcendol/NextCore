@@ -12,9 +12,12 @@ interface Genre {
 
 const GenrePage: React.FC = () => {
     const [genres, setGenres] = useState<Genre[]>([]);
+    const [genre, setGenre] = useState<Genre | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
+    const [showDeletePopup, setShowDeletePopup] = useState<boolean>(false);
     const itemsPerPage = 20;
 
     useEffect(() => {
@@ -48,6 +51,43 @@ const GenrePage: React.FC = () => {
   
     const handlePageChange = (page: number) => {
       setCurrentPage(page);
+    };
+
+    // Handling Delete
+    const handleDeleteClick = (genreId: string) => {
+        setGenre(genres.find((g) => g.genreId === genreId) || null);
+        setShowDeletePopup(true);
+    };
+    
+    const handleDeleteConfirm = async () => {
+        if (!genre) return;
+    
+        setIsDeleting(true);
+        setError(null);
+    
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/genre/delete/${genre.genreId}`, {
+                method: "POST",
+            });
+    
+            if (!res.ok) {
+                const errorData = await res.json();
+                console.error("Backend error:", errorData);
+                throw new Error(errorData?.message || "Failed to delete genre.");
+            }
+    
+            setGenres(genres.filter((g) => g.genreId !== genre.genreId));
+            setShowDeletePopup(false);
+        } catch (err) {
+            console.error("Error deleting genre:", err);
+            setError((err as Error).message || "An unexpected error occurred.");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+    
+    const handleDeleteCancel = () => {
+        setShowDeletePopup(false);
     };
 
     return (
@@ -93,16 +133,16 @@ const GenrePage: React.FC = () => {
                                             <span className="text-white text-sm">View</span>
                                         </button>
                                         </Link>
-                                        <Link href={`/admindashboard/genre/update/${genre.genreName}`}>
+                                        <Link href={`/admindashboard/genre/update/${genre.genreId}`}>
                                         <button className="bg-yellow-400 w-20 m-2 py-2 rounded-lg hover:bg-yellow-500">
                                             <span className="text-white text-sm">Update</span>
                                         </button>
                                         </Link>
-                                        <Link href={``}>
-                                        <button className="bg-red-600 w-20 py-2 m-2 rounded-lg hover:bg-red-700">
+                                        <button 
+                                            className="bg-red-600 w-20 py-2 m-2 rounded-lg hover:bg-red-700"
+                                            onClick={() => handleDeleteClick(genre.genreId)}>
                                             <span className="text-white text-sm">Delete</span>
                                         </button>
-                                        </Link>
                                     </div>
                                 </td>
                             </tr>
@@ -110,6 +150,34 @@ const GenrePage: React.FC = () => {
                     </tbody>
                 </table>
             </div>
+
+            {/* Delete Confirmation Popup */}
+            {showDeletePopup && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
+                        <h2 className="text-lg font-semibold text-gray-700 mb-2">Confirm Deletion</h2>
+                        <p className="text-sm text-gray-500 mb-6">
+                            Are you sure you want to delete this genre? This action cannot be undone.
+                        </p>
+                        <div className="flex justify-around">
+                            <button
+                                onClick={handleDeleteCancel}
+                                className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteConfirm}
+                                disabled={isDeleting}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300"
+                            >
+                                {isDeleting ? "Deleting..." : "Confirm"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {totalPages > 1 && (
                 <div className="flex justify-center mt-6">
                     <nav className="inline-flex -space-x-px">
