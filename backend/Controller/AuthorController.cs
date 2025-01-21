@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using NextCore.backend.Models;
+using NextCore.backend.Dtos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -43,8 +44,8 @@ public class AuthorController : ControllerBase
                         a.authorEmail,
                         a.authorPhone
                     FROM 
-                        authors a"
-                ;
+                        authors a
+                ";
                 _logger.LogDebug("Executing query: {Query}", query);
 
                 using (MySqlCommand command = new MySqlCommand(query, connection))

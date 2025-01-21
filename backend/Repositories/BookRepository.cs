@@ -2,6 +2,7 @@ using NextCore.backend.Repositories;
 using NextCore.backend.Context;
 using NextCore.backend.Models;
 using Microsoft.EntityFrameworkCore;
+using NextCore.backend.Dtos;
 public class BookRepository : IBookRepository {
     private readonly ApplicationContext _context; 
 

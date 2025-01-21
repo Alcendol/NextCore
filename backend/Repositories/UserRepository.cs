@@ -5,8 +5,8 @@ namespace NextCore.backend.Repositories
 {
     public class UserRepository: IUserRepository
     {
-        private readonly UserContext _context;
-        public UserRepository(UserContext context)
+        private readonly ApplicationContext _context;
+        public UserRepository(ApplicationContext context)
         {
             _context = context;
         }
@@ -20,12 +20,12 @@ namespace NextCore.backend.Repositories
         
         public User GetByEmail(string email)
         {
-            return _context.Users.FirstOrDefault(u => u.userEmail == email);
+            return _context.Users.FirstOrDefault(u => u.userEmail == email)!;
         }
 
         public User GetById(string userId)
         {
-            return _context.Users.FirstOrDefault(u => u.userId == userId);
+            return _context.Users.FirstOrDefault(u => u.userId == userId)!;
         }
     }
 }

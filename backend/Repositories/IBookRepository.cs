@@ -1,4 +1,5 @@
 using NextCore.backend.Models;
+using NextCore.backend.Dtos;
 namespace NextCore.backend.Repositories{
     public interface IBookRepository {
         Task<IEnumerable<Book>> GetBooks();

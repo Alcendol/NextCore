@@ -1,9 +1,15 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NextCore.backend.Models{    
     public class Authorship {
-        public required string authorshipId {get; set;} //PK
-        public required string authorId {get; set;} //FK to author
+        [Key]
+        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public required int authorshipId {get; set;} //PK
+        [Required]
+        public required int authorId {get; set;} //FK to author
+        [Required]
         public required string bookId {get; set;} //FK to book
 
         [ForeignKey("authorId")]
