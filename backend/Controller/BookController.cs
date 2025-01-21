@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
+using NextCore.backend.Dtos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -49,7 +50,7 @@ public class BookController : ControllerBase
                         b.description, 
                         b.image, 
                         b.mediaType, 
-                        b.stock 
+                        COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
                     FROM 
                         books b
                     JOIN 
@@ -60,6 +61,8 @@ public class BookController : ControllerBase
                         authorships at ON b.bookId = at.bookId
                     JOIN 
                         authors a ON a.authorId = at.authorId
+                    JOIN
+                        bookCopies bc ON bc.bookId = b.bookId
                     LEFT JOIN 
                         bookGenres bg ON bg.bookId = b.bookId
                     LEFT JOIN 
@@ -137,7 +140,7 @@ public class BookController : ControllerBase
                         b.description, 
                         b.image, 
                         b.mediaType, 
-                        b.stock 
+                        COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
                     FROM 
                         books b
                     JOIN 
@@ -148,6 +151,8 @@ public class BookController : ControllerBase
                         authorships at ON b.bookId = at.bookId
                     JOIN 
                         authors a ON a.authorId = at.authorId
+                    JOIN
+                        bookCopies bc ON bc.bookId = b.bookId
                     LEFT JOIN 
                         bookGenres bg ON bg.bookId = b.bookId
                     LEFT JOIN 
@@ -230,7 +235,7 @@ public class BookController : ControllerBase
                         b.description, 
                         b.image, 
                         b.mediaType, 
-                        b.stock 
+                        COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
                     FROM 
                         books b
                     JOIN 
@@ -241,6 +246,8 @@ public class BookController : ControllerBase
                         authorships at ON b.bookId = at.bookId
                     JOIN 
                         authors a ON a.authorId = at.authorId
+                    JOIN
+                        bookCopies bc ON bc.bookId = b.bookId
                     LEFT JOIN 
                         bookGenres bg ON bg.bookId = b.bookId
                     LEFT JOIN 
@@ -325,7 +332,7 @@ public class BookController : ControllerBase
                         b.description, 
                         b.image, 
                         b.mediaType, 
-                        b.stock 
+                        COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
                     FROM 
                         books b
                     JOIN 
@@ -336,6 +343,8 @@ public class BookController : ControllerBase
                         authorships at ON b.bookId = at.bookId
                     JOIN 
                         authors a ON a.authorId = at.authorId
+                    JOIN
+                        bookCopies bc ON bc.bookId = b.bookId
                     LEFT JOIN 
                         bookGenres bg ON bg.bookId = b.bookId
                     LEFT JOIN 
@@ -419,7 +428,7 @@ public class BookController : ControllerBase
                         b.description, 
                         b.image, 
                         b.mediaType, 
-                        b.stock 
+                        COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
                     FROM 
                         books b
                     JOIN 
@@ -434,6 +443,8 @@ public class BookController : ControllerBase
                         booksPublished bp ON b.bookId = bp.bookId
                     JOIN 
                         publishers p ON p.publisherId = bp.publisherId
+                    JOIN
+                        bookCopies bc ON bc.bookId = b.bookId
                     WHERE 
                         g.genreId = @genreId
                     GROUP BY 
@@ -656,8 +667,8 @@ public class BookController : ControllerBase
 
                     // Insert the book
                     string insertBookQuery = @"
-                        INSERT INTO books (bookId, title, datePublished, totalPage, country, language, description, image, mediaType, stock) 
-                        VALUES (@bookId, @title, @datePublished, @totalPage, @country, @language, @desc, @image, @mediaType, @stock)";
+                        INSERT INTO books (bookId, title, datePublished, totalPage, country, language, description, image, mediaType) 
+                        VALUES (@bookId, @title, @datePublished, @totalPage, @country, @language, @desc, @image, @mediaType)";
                     using (var bookCommand = new MySqlCommand(insertBookQuery, connection, transaction))
                     {
                         bookCommand.Parameters.AddWithValue("@bookId", book.bookId);
@@ -669,7 +680,6 @@ public class BookController : ControllerBase
                         bookCommand.Parameters.AddWithValue("@desc", book.description);
                         bookCommand.Parameters.AddWithValue("@image", book.image);
                         bookCommand.Parameters.AddWithValue("@mediaType", book.mediaType);
-                        bookCommand.Parameters.AddWithValue("@stock", book.stock);
 
                         bookCommand.ExecuteNonQuery();
                     }
@@ -716,6 +726,17 @@ public class BookController : ControllerBase
                         }
                     }
 
+                    // Insert book copies
+                    string insertBookCopiesQuery = "INSERT INTO bookCopies (bookId, status) VALUES (@bookId, @status)";
+                    using(var bookCopiesCommand = new MySqlCommand(insertBookCopiesQuery, connection, transaction)){
+                        for (int i = 0; i < book.stock; i++){
+                            bookCopiesCommand.Parameters.Clear();
+                            bookCopiesCommand.Parameters.AddWithValue("@bookId", book.bookId);
+                            bookCopiesCommand.Parameters.AddWithValue("@status", bookStatus.Available);
+
+                            bookCopiesCommand.ExecuteNonQuery();
+                        }
+                    }
                     transaction.Commit();
                 }
             }

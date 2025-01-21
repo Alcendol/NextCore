@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NextCore.backend.Models{
     public class BookGenre{
-        public required string genreId; // FK to genre
+        [Required]
+        public required int genreId; // FK to genre
+        [Required]
         public required string bookId; // FK to book
 
         [ForeignKey("bookId")]
