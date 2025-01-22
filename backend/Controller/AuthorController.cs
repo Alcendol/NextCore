@@ -26,10 +26,11 @@ public class AuthorController : ControllerBase
     public ActionResult<List<Author>> Index()
     {
         _logger.LogDebug("Fetching all authors from the database.");
+        List<Author> authorsList = new();
 
         try
         {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
+            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? throw new Exception("Connection string not found.");
             _logger.LogDebug("Connection string retrieved.");
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -39,12 +40,13 @@ public class AuthorController : ControllerBase
 
                 string query = @"
                     SELECT 
-                        a.authorId,
-                        a.authorName,
-                        a.authorEmail,
-                        a.authorPhone
+                        authorId,
+                        firstName,
+                        lastName,
+                        authorEmail,
+                        authorPhone
                     FROM 
-                        authors a
+                        authors
                 ";
                 _logger.LogDebug("Executing query: {Query}", query);
 
@@ -56,21 +58,22 @@ public class AuthorController : ControllerBase
 
                         while (reader.Read())
                         {
-                            AuthorDTO book = new AuthorDTO
+                            Author author = new()
                             {
-                                authorId = reader.GetString(0),
-                                authorName = reader.GetString(1),
-                                authorEmail = reader.GetString(2),
-                                authorPhone = reader.GetString(3),
+                                authorId = reader.GetInt32(0),
+                                firstName = reader.GetString(1),
+                                lastName = reader.IsDBNull(2) ? null : reader.GetString(2),
+                                authorEmail = reader.IsDBNull(3) ? null : reader.GetString(3),
+                                authorPhone = reader.IsDBNull(4) ? null : reader.GetString(4)
                             };
-                            AuthorsList.Add(book);
+                            authorsList.Add(author);
                         }
                     }
                 }
             }
 
             _logger.LogDebug("Authors successfully fetched.");
-            return Ok(AuthorsList);
+            return Ok(authorsList);
         }
         catch (Exception ex)
         {
@@ -96,8 +99,9 @@ public class AuthorController : ControllerBase
                 string query = @"
                     SELECT 
                         a.authorId,
-                        a.authorName,
-                        a.authorEmail,
+                        a.firstName,
+                        a.lastName,
+                        a.authorEmail
                         a.authorPhone
                     FROM 
                         authors a
@@ -115,8 +119,9 @@ public class AuthorController : ControllerBase
                         if(reader.Read())
                         {    AuthorDTO author = new AuthorDTO
                             {
-                                authorId = reader.GetString(0),
-                                authorName = reader.GetString(1),
+                                authorId = reader.GetInt32(0),
+                                firstName = reader.GetString(1),
+                                lastName = reader.GetString(2),
                                 authorEmail = reader.GetString(2),
                                 authorPhone = reader.GetString(3),
                             };
@@ -164,12 +169,13 @@ public class AuthorController : ControllerBase
 
                     // Insert the book
                     string insertBookQuery = @"
-                        INSERT INTO authors (authorId, authorName, authorEmail, authorPhone) 
-                        VALUES (@authorId, @authorName, @authorEmail, @authorPhone)";
+                        INSERT INTO authors (authorId, firstName, lastName, authorEmail, authorPhone) 
+                        VALUES (@authorId, @firstName, @lastName, @authorEmail, @authorPhone)";
                     using (var authorCommand = new MySqlCommand(insertBookQuery, connection, transaction))
                     {
                         authorCommand.Parameters.AddWithValue("@authorId", author.authorId);
-                        authorCommand.Parameters.AddWithValue("@authorName", author.authorName);
+                        authorCommand.Parameters.AddWithValue("@firstName", author.firstName);
+                        authorCommand.Parameters.AddWithValue("@lastName", author.lastName);
                         authorCommand.Parameters.AddWithValue("@authorEmail", author.authorEmail);
                         authorCommand.Parameters.AddWithValue("@authorPhone", author.authorPhone);
 
@@ -225,14 +231,16 @@ public class AuthorController : ControllerBase
                     string updateAuthorQuery = @"
                         UPDATE authors
                         SET 
-                            authorName = @authorName, 
+                            firstName = @firstName,
+                            lastName = @lastName, 
                             authorEmail = @authorEmail, 
                             authorPhone = @authorPhone
                         WHERE authorId = @authorId";
                     using (var updateCommand = new MySqlCommand(updateAuthorQuery, connection, transaction))
                     {
                         updateCommand.Parameters.AddWithValue("@authorId", authorId);
-                        updateCommand.Parameters.AddWithValue("@authorName", author.authorName);
+                        updateCommand.Parameters.AddWithValue("@firstName", author.lastName);
+                        updateCommand.Parameters.AddWithValue("@lastName", author.firstName);
                         updateCommand.Parameters.AddWithValue("@authorEmail", author.authorEmail);
                         updateCommand.Parameters.AddWithValue("@authorPhone", author.authorPhone);
 
