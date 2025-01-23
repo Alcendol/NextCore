@@ -39,34 +39,37 @@ public class BookController : ControllerBase
                 string query = @"
                     SELECT 
                         b.bookId, 
-                        GROUP_CONCAT(DISTINCT a.authorName SEPARATOR ', ') AS authorName,
+                        GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') AS authorName,
                         GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
                         b.title, 
                         b.datePublished,
                         b.totalPage, 
                         b.country, 
                         b.language, 
-                        GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ') AS genre, 
+                        (   SELECT 
+                                GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ')
+                            FROM 
+                                BookGenres bg
+                            JOIN 
+                                Genres g ON bg.genreId = g.genreId
+                            WHERE 
+                                bg.bookId = b.bookId) AS genre, 
                         b.description, 
                         b.image, 
                         b.mediaType, 
                         COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
                     FROM 
-                        books b
+                        Books b
                     JOIN 
-                        booksPublished bp ON b.bookId = bp.bookId
+                        BooksPublished bp ON b.bookId = bp.bookId
                     JOIN 
-                        publishers p ON bp.publisherId = p.publisherId
+                        Publishers p ON bp.publisherId = p.publisherId
                     JOIN 
-                        authorships at ON b.bookId = at.bookId
+                        Authorships at ON b.bookId = at.bookId
                     JOIN 
-                        authors a ON a.authorId = at.authorId
+                        Authors a ON a.authorId = at.authorId
                     JOIN
-                        bookCopies bc ON bc.bookId = b.bookId
-                    LEFT JOIN 
-                        bookGenres bg ON bg.bookId = b.bookId
-                    LEFT JOIN 
-                        genres g ON bg.genreId = g.genreId
+                        BookCopies bc ON bc.bookId = b.bookId
                     GROUP BY 
                         b.bookId;
                 ";
@@ -129,35 +132,38 @@ public class BookController : ControllerBase
                 string query = @"
                     SELECT 
                         b.bookId, 
-                        GROUP_CONCAT(DISTINCT a.authorName SEPARATOR ', ') AS authorName,
-                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName, 
+                        GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') AS authorName,
+                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
                         b.title, 
                         b.datePublished,
                         b.totalPage, 
                         b.country, 
                         b.language, 
-                        GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ') AS genre, 
+                        (   SELECT 
+                                GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ')
+                            FROM 
+                                BookGenres bg
+                            JOIN 
+                                Genres g ON bg.genreId = g.genreId
+                            WHERE 
+                                bg.bookId = b.bookId) AS genre, 
                         b.description, 
                         b.image, 
                         b.mediaType, 
                         COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
                     FROM 
-                        books b
+                        Books b
                     JOIN 
-                        booksPublished bp ON b.bookId = bp.bookId
+                        BooksPublished bp ON b.bookId = bp.bookId
                     JOIN 
-                        publishers p ON bp.publisherId = p.publisherId
+                        Publishers p ON bp.publisherId = p.publisherId
                     JOIN 
-                        authorships at ON b.bookId = at.bookId
+                        Authorships at ON b.bookId = at.bookId
                     JOIN 
-                        authors a ON a.authorId = at.authorId
+                        Authors a ON a.authorId = at.authorId
                     JOIN
-                        bookCopies bc ON bc.bookId = b.bookId
-                    LEFT JOIN 
-                        bookGenres bg ON bg.bookId = b.bookId
-                    LEFT JOIN 
-                        genres g ON bg.genreId = g.genreId
-                    WHERE 
+                        BookCopies bc ON bc.bookId = b.bookId
+                    WHERE
                         b.bookId = @bookId
                     GROUP BY 
                         b.bookId;
@@ -224,34 +230,37 @@ public class BookController : ControllerBase
                 string query = @"
                     SELECT 
                         b.bookId, 
-                        GROUP_CONCAT(DISTINCT a.authorName SEPARATOR ', ') AS authorName, 
-                        p.publisherName, 
+                        GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') AS authorName,
+                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
                         b.title, 
                         b.datePublished,
                         b.totalPage, 
                         b.country, 
                         b.language, 
-                        GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ') AS genre, 
+                        (   SELECT 
+                                GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ')
+                            FROM 
+                                BookGenres bg
+                            JOIN 
+                                Genres g ON bg.genreId = g.genreId
+                            WHERE 
+                                bg.bookId = b.bookId) AS genre, 
                         b.description, 
                         b.image, 
                         b.mediaType, 
                         COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
                     FROM 
-                        books b
+                        Books b
                     JOIN 
-                        booksPublished bp ON b.bookId = bp.bookId
+                        BooksPublished bp ON b.bookId = bp.bookId
                     JOIN 
-                        publishers p ON bp.publisherId = p.publisherId
+                        Publishers p ON bp.publisherId = p.publisherId
                     JOIN 
-                        authorships at ON b.bookId = at.bookId
+                        Authorships at ON b.bookId = at.bookId
                     JOIN 
-                        authors a ON a.authorId = at.authorId
+                        Authors a ON a.authorId = at.authorId
                     JOIN
-                        bookCopies bc ON bc.bookId = b.bookId
-                    LEFT JOIN 
-                        bookGenres bg ON bg.bookId = b.bookId
-                    LEFT JOIN 
-                        genres g ON bg.genreId = g.genreId
+                        BookCopies bc ON bc.bookId = b.bookId
                     WHERE 
                         a.authorId = @AuthorId
                     GROUP BY 
@@ -280,7 +289,7 @@ public class BookController : ControllerBase
                                 totalPage = reader.GetInt32(5),
                                 country = reader.IsDBNull(6) ? "" : reader.GetString(6),
                                 language = reader.IsDBNull(7) ? "" : reader.GetString(7),
-                                genre = reader.IsDBNull(8) ? "" : reader.GetString(8),
+                                genre = reader.GetString(8),
                                 description = reader.GetString(9),
                                 image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
                                 mediaType = reader.GetString(11),
@@ -321,34 +330,37 @@ public class BookController : ControllerBase
                 string query = @"
                     SELECT 
                         b.bookId, 
-                        GROUP_CONCAT(DISTINCT a.authorName SEPARATOR ', ') AS authorName, 
-                        p.publisherName, 
+                        GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') AS authorName,
+                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
                         b.title, 
                         b.datePublished,
                         b.totalPage, 
                         b.country, 
                         b.language, 
-                        GROUP_CONCAT(DISTINCT, g.genreName SEPARATOR ', ') AS genre, 
+                        (   SELECT 
+                                GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ')
+                            FROM 
+                                BookGenres bg
+                            JOIN 
+                                Genres g ON bg.genreId = g.genreId
+                            WHERE 
+                                bg.bookId = b.bookId) AS genre, 
                         b.description, 
                         b.image, 
                         b.mediaType, 
                         COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
                     FROM 
-                        books b
+                        Books b
                     JOIN 
-                        booksPublished bp ON b.bookId = bp.bookId
+                        BooksPublished bp ON b.bookId = bp.bookId
                     JOIN 
-                        publishers p ON bp.publisherId = p.publisherId
+                        Publishers p ON bp.publisherId = p.publisherId
                     JOIN 
-                        authorships at ON b.bookId = at.bookId
+                        Authorships at ON b.bookId = at.bookId
                     JOIN 
-                        authors a ON a.authorId = at.authorId
+                        Authors a ON a.authorId = at.authorId
                     JOIN
-                        bookCopies bc ON bc.bookId = b.bookId
-                    LEFT JOIN 
-                        bookGenres bg ON bg.bookId = b.bookId
-                    LEFT JOIN 
-                        genres g ON bg.genreId = g.genreId
+                        BookCopies bc ON bc.bookId = b.bookId
                     WHERE 
                         p.publisherId = @publisherId
                     GROUP BY 
@@ -413,38 +425,41 @@ public class BookController : ControllerBase
             {
                 connection.Open();
                 _logger.LogDebug("Database connection opened.");
-
+                // yang ini masih tricky jangan diotak atik dulu
                 string query = @"
                     SELECT 
                         b.bookId, 
-                        GROUP_CONCAT(DISTINCT a.authorName SEPARATOR ', ') AS authorName,
+                        GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') AS authorName,
                         GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
                         b.title, 
-                        b.datePublished, 
+                        b.datePublished,
                         b.totalPage, 
                         b.country, 
                         b.language, 
-                        GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ') AS genre, 
+                        (   SELECT 
+                                GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ')
+                            FROM 
+                                BookGenres bg
+                            JOIN 
+                                Genres g ON bg.genreId = g.genreId
+                            WHERE 
+                                bg.bookId = b.bookId) AS genre, 
                         b.description, 
                         b.image, 
                         b.mediaType, 
                         COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
                     FROM 
-                        books b
+                        Books b
                     JOIN 
-                        bookGenre bg ON bg.bookGenreId = b.bookGenreId
+                        BooksPublished bp ON b.bookId = bp.bookId
                     JOIN 
-                        genre g ON g.genreId = bg.genreId
+                        Publishers p ON bp.publisherId = p.publisherId
                     JOIN 
-                        authorships at ON b.bookId = at.bookId
+                        Authorships at ON b.bookId = at.bookId
                     JOIN 
-                        authors a ON a.authorId = at.authorId
-                    JOIN 
-                        booksPublished bp ON b.bookId = bp.bookId
-                    JOIN 
-                        publishers p ON p.publisherId = bp.publisherId
+                        Authors a ON a.authorId = at.authorId
                     JOIN
-                        bookCopies bc ON bc.bookId = b.bookId
+                        BookCopies bc ON bc.bookId = b.bookId
                     WHERE 
                         g.genreId = @genreId
                     GROUP BY 
