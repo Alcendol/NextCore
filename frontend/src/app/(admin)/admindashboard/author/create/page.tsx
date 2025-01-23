@@ -6,8 +6,8 @@ import { IoCaretBackOutline } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 
 const CreatePageAuthor = () => {
-    const [authorId, setAuthorId] = useState("");
-    const [authorName, setAuthorName] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [authorEmail, setAuthorEmail] = useState("");
     const [authorPhone, setAuthorPhone] = useState("");
     const [showConfirmation, setShowConfirmation] = useState(false);
@@ -17,8 +17,8 @@ const CreatePageAuthor = () => {
     const handleSubmit = async () => {
         try {
             const formData = new FormData();
-            formData.append("authorId", authorId);
-            formData.append("authorName", authorName);
+            formData.append("firstName", firstName);
+            formData.append("lastName", lastName);
             formData.append("authorEmail", authorEmail);
             formData.append("authorPhone", authorPhone);
 
@@ -43,7 +43,7 @@ const CreatePageAuthor = () => {
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!authorId || !authorName || !authorEmail || !authorPhone) {
+        if (!firstName || !lastName || !authorEmail || !authorPhone) {
             alert("All fields are required");
             return;
         }
@@ -65,25 +65,25 @@ const CreatePageAuthor = () => {
                     className="bg-white border border-gray-400 p-4 w-full"
                     onSubmit={handleFormSubmit}
                 >
-                    <label htmlFor="authorId" className="block text-sm text-gray-700 font-sans mb-2">
-                        Id Author:
+                    <label htmlFor="firstName" className="block text-sm text-gray-700 font-sans mb-2">
+                        First Name:
                     </label>
                     <input
-                        id="authorId"
+                        id="firstName"
                         type="text"
-                        onChange={(e) => setAuthorId(e.target.value)}
-                        value={authorId}
-                        placeholder="e.g: 1231"
+                        onChange={(e) => setFirstName(e.target.value)}
+                        value={firstName}
+                        placeholder="e.g: Tere Liye"
                         className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                     />
-                    <label htmlFor="authorName" className="block text-sm text-gray-700 font-sans mb-2">
-                        Nama Author:
+                    <label htmlFor="lastName" className="block text-sm text-gray-700 font-sans mb-2">
+                        Last Name:
                     </label>
                     <input
-                        id="authorName"
+                        id="lastName"
                         type="text"
-                        onChange={(e) => setAuthorName(e.target.value)}
-                        value={authorName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        value={lastName}
                         placeholder="e.g: Tere Liye"
                         className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                     />

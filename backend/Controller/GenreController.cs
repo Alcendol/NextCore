@@ -56,7 +56,7 @@ public class GenreController : ControllerBase
                         {
                             GenreDTO genre = new GenreDTO
                             {
-                                genreId = reader.GetString(0),
+                                genreId = reader.GetInt32(0),
                                 genreName = reader.GetString(1),
                             };
                             GenresList.Add(genre);
@@ -109,7 +109,7 @@ public class GenreController : ControllerBase
                         if(reader.Read())
                         {    GenreDTO genre = new GenreDTO
                             {
-                                genreId = reader.GetString(0),
+                                genreId = reader.GetInt32(0),
                                 genreName = reader.GetString(1),    
                             };
                             _logger.LogDebug("Genre fetched successfully");
@@ -158,12 +158,12 @@ public class GenreController : ControllerBase
                     string insertBookQuery = @"
                         INSERT INTO genres (genreId, genreName) 
                         VALUES (@genreId, @genreName)";
-                    using (var authorCommand = new MySqlCommand(insertBookQuery, connection, transaction))
+                    using (var genreCommand = new MySqlCommand(insertBookQuery, connection, transaction))
                     {
-                        authorCommand.Parameters.AddWithValue("@genreId", genre.genreId);
-                        authorCommand.Parameters.AddWithValue("@genreName", genre.genreName);
+                        genreCommand.Parameters.AddWithValue("@genreId", genre.genreId);
+                        genreCommand.Parameters.AddWithValue("@genreName", genre.genreName);
 
-                        authorCommand.ExecuteNonQuery();
+                        genreCommand.ExecuteNonQuery();
                     }
 
                     transaction.Commit();

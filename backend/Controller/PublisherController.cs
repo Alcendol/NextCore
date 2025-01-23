@@ -39,12 +39,12 @@ public class PublisherController : ControllerBase
 
                 string query = @"
                     SELECT 
-                        a.publisherId,
-                        a.publisherName,
-                        a.publisherEmail,
-                        a.publisherPhone
+                        p.publisherId,
+                        p.publisherName,
+                        p.publisherEmail,
+                        p.publisherPhone
                     FROM 
-                        publishers a"
+                        publishers p"
                 ;
                 _logger.LogDebug("Executing query: {Query}", query);
 
@@ -58,10 +58,10 @@ public class PublisherController : ControllerBase
                         {
                             PublisherDTO publisher = new PublisherDTO
                             {
-                                publisherId = reader.GetString(0),
+                                publisherId = reader.GetInt32(0),
                                 publisherName = reader.GetString(1),
-                                publisherEmail = reader.GetString(2),
-                                publisherPhone = reader.GetString(3),
+                                publisherEmail = reader.IsDBNull(2) ? null : reader.GetString(2),
+                                publisherPhone = reader.IsDBNull(3) ? null : reader.GetString(3),
                             };
                             PublishersList.Add(publisher);
                         }
@@ -115,7 +115,7 @@ public class PublisherController : ControllerBase
                         if(reader.Read())
                         {    PublisherDTO publisher = new PublisherDTO
                             {
-                                publisherId = reader.GetString(0),
+                                publisherId = reader.GetInt32(0),
                                 publisherName = reader.GetString(1),
                                 publisherEmail = reader.GetString(2),
                                 publisherPhone = reader.GetString(3),

@@ -47,7 +47,7 @@ const PublisherPage: React.FC = () => {
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentBooks = publishers.slice(indexOfFirstItem, indexOfLastItem);
+    const currentPublishers = publishers.slice(indexOfFirstItem, indexOfLastItem);
 
     const totalPages = Math.ceil(publishers.length / itemsPerPage);
 
@@ -126,7 +126,7 @@ const PublisherPage: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentBooks.map((publisher) => (
+                        {currentPublishers.map((publisher) => (
                             <tr key={publisher.publisherId} className="bg-gray-100 hover:bg-gray-200">
                                 <td className="px-4 py-2 border border-gray-300">{publisher.publisherId}</td>
                                 <td className="px-4 py-2 border border-gray-300">{publisher.publisherName}</td>

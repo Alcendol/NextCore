@@ -8,7 +8,8 @@ import { IoAlertCircleSharp, IoAddCircle, } from "react-icons/io5";
 
 interface Author {
     authorId: string;
-    authorName: string;
+    firstName: string;
+    lastName: string;
     authorEmail: string;
     authorPhone: string;
 }
@@ -130,7 +131,7 @@ const AuthorPage: React.FC = () => {
                         {currentAuthors.map((author) => (
                             <tr key={author.authorId} className="bg-gray-100 hover:bg-gray-200">
                                 <td className="px-4 py-2 border border-gray-300">{author.authorId}</td>
-                                <td className="px-4 py-2 border border-gray-300">{author.authorName}</td>
+                                <td className="px-4 py-2 border border-gray-300">{author.firstName} {author.lastName}</td>
                                 <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{author.authorEmail}</td>
                                 <td className="hidden md:table-cell px-4 py-2 border border-gray-300">{author.authorPhone}</td>
                                 <td className="py-2 border border-gray-300">
