@@ -40,13 +40,13 @@ public class AuthorController : ControllerBase
 
                 string query = @"
                     SELECT 
-                        authorId,
-                        firstName,
-                        lastName,
-                        authorEmail,
-                        authorPhone
+                        a.authorId,
+                        a.firstName,
+                        a.lastName,
+                        a.authorEmail,
+                        a.authorPhone
                     FROM 
-                        authors
+                        authors a
                 ";
                 _logger.LogDebug("Executing query: {Query}", query);
 
@@ -101,7 +101,7 @@ public class AuthorController : ControllerBase
                         a.authorId,
                         a.firstName,
                         a.lastName,
-                        a.authorEmail
+                        a.authorEmail,
                         a.authorPhone
                     FROM 
                         authors a
@@ -122,8 +122,8 @@ public class AuthorController : ControllerBase
                                 authorId = reader.GetInt32(0),
                                 firstName = reader.GetString(1),
                                 lastName = reader.GetString(2),
-                                authorEmail = reader.GetString(2),
-                                authorPhone = reader.GetString(3),
+                                authorEmail = reader.GetString(3),
+                                authorPhone = reader.GetString(4),
                             };
                             _logger.LogDebug("Author fetched successfully");
                             return Ok(author);

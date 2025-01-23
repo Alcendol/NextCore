@@ -7,7 +7,8 @@ import { IoCaretBackOutline } from "react-icons/io5";
 
 interface Author {
     authorId: string;
-    authorName: string;
+    firstName: string;
+    lastName: string;
     authorEmail: string;
     authorPhone: string;
 }
@@ -57,7 +58,7 @@ const ViewPageAuthor: React.FC = () => {
             </div>
             {author && (
                 <div className="w-full flex justify-start items-center mb-5">
-                    <span className="font-sans font-bold text-xl">Detail Data Author {author.authorName}</span>
+                    <span className="font-sans font-bold text-xl">Detail Data Author {author.firstName} {author.lastName}</span>
                 </div>
             )}
             {author && (
@@ -73,13 +74,23 @@ const ViewPageAuthor: React.FC = () => {
                             disabled
                             className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                         />
-                        <label htmlFor="authorName" className="block text-sm text-gray-700 font-sans mt-4 mb-2">
-                            Nama Author
+                        <label htmlFor="firstName" className="block text-sm text-gray-700 font-sans mt-4 mb-2">
+                            First Name
                         </label>
                         <input
-                            id="authorName"
+                            id="firstName"
                             type="text"
-                            value={author.authorName}
+                            value={author.firstName}
+                            disabled
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                        />
+                        <label htmlFor="lastName" className="block text-sm text-gray-700 font-sans mt-4 mb-2">
+                            Last Name
+                        </label>
+                        <input
+                            id="lastName"
+                            type="text"
+                            value={author.lastName}
                             disabled
                             className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                         />

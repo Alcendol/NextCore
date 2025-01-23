@@ -1,29 +1,88 @@
-"client side";
-
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 const Navbar = () => {
+    const [user, setUser] = useState(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    // Toggle the menu
+    const route = useRouter();
     const toggleMenu = () => {
-      setIsMenuOpen((prev) => !prev);
+        setIsMenuOpen((prev) => !prev);
     };
+
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const getUser = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                
+                if (!response.ok) {
+                    setUser(null);
+                    return;
+                }
+
+                const userData = await response.json();
+                setUser(userData);
+            } catch (error) {
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        getUser();
+    }, []);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    const handleLogout = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Logout failed');
+            }
+
+            const data = await response.json();
+            console.log(data.message);
+
+            setUser(null);
+            setTimeout(() => route.push("/signin"), 300);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                alert(error.message || 'Logout failed.');
+            } else {
+                alert('An unexpected error occurred.');
+            }
+        }
+    };
+
     return (
         <header className="fixed top-0 left-0 w-full h-20 bg-gray-100 border-b border-gray-200 z-50">
             <div className="container mx-auto flex justify-between items-center h-full px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center gap-2">
                     <Link href="/home" className="flex items-center gap-2">
-                    <Image
-                        src="/logo.jpeg"
-                        alt="logo"
-                        width={30}
-                        height={30}
-                        className="rounded-full"
-                    />
-                    <span className="text-xl font-bold text-gray-700">TamanBaca</span>
+                        <Image
+                            src="/logo.jpeg"
+                            alt="logo"
+                            width={30}
+                            height={30}
+                            className="rounded-full"
+                        />
+                        <span className="text-xl font-bold text-gray-700">TamanBaca</span>
                     </Link>
                 </div>
 
@@ -63,20 +122,31 @@ const Navbar = () => {
                                 <Image src="/search.png" alt="" width={14} height={14}></Image>
                                 <input type="text" placeholder="Search...." className="w-[200px] p-2 bg-transparent outline-none" />
                             </div>
-                            <div className="hidden"></div>
                         </div>
-                        <Link
-                            href="/signin"
-                            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 transition"
-                        >
-                            Login
-                        </Link>
-                        <Link
-                            href="/signup"
-                            className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition"
-                        >
-                            Signup
-                        </Link>
+
+                        {!user ? (
+                            <>
+                                <Link
+                                    href="/signin"
+                                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 transition"
+                                >
+                                    Login
+                                </Link>
+                                <Link
+                                    href="/signup"
+                                    className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition"
+                                >
+                                    Signup
+                                </Link>
+                            </>
+                        ) : (
+                            <button
+                                onClick={handleLogout}
+                                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 transition"
+                            >
+                                Logout
+                            </button>
+                        )}
                     </div>
                 </nav>
 
@@ -119,19 +189,31 @@ const Navbar = () => {
                             </li>
                         </Link>
                         <li className="flex justify-between w-full">
-                            <Link
-                                href="/signin"
-                                className="px-4 py-2 border bg-slate-200 border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-400 transition w-5/6 mr-5 flex justify-center"
-                                onClick={toggleMenu}>
-                                    Login
-                            </Link>
-                            <Link
-                                href="/signup"
-                                className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition w-5/6 ml-5 flex justify-center"
-                                onClick={toggleMenu}
+                            {!user ? (
+                                <>
+                                    <Link
+                                        href="/signin"
+                                        className="px-4 py-2 border bg-slate-200 border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-400 transition w-5/6 mr-5 flex justify-center"
+                                        onClick={toggleMenu}
+                                    >
+                                        Login
+                                    </Link>
+                                    <Link
+                                        href="/signup"
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition w-5/6 ml-5 flex justify-center"
+                                        onClick={toggleMenu}
+                                    >
+                                        Signup
+                                    </Link>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={handleLogout}
+                                    className="px-4 py-2 border bg-slate-200 border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-400 transition w-5/6 mr-5 flex justify-center"
                                 >
-                                    Signup
-                            </Link>
+                                    Logout
+                                </button>
+                            )}
                         </li>
                         <li className="w-full">
                             <div className="flex items-center justify-between py-4 w-full">
@@ -139,7 +221,6 @@ const Navbar = () => {
                                     <Image src="/search.png" alt="" width={15} height={15}></Image>
                                     <input type="text" placeholder="Search...." className="w-full p-2 bg-transparent outline-none" />
                                 </div>
-                                <div className="hidden"></div>
                             </div>
                         </li>
                     </ul>

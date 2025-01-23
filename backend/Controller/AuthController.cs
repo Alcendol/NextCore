@@ -3,6 +3,7 @@ using NextCore.backend.Dtos;
 using NextCore.backend.Helpers;
 using NextCore.backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace auth.Controllers
 {
@@ -12,6 +13,8 @@ namespace auth.Controllers
     {
         private readonly IUserRepository _repository;
         private readonly JwtService _jwtService;
+        private const string UploadsFolder = "uploads";
+
         public AuthController(IUserRepository repository, JwtService jwtService) {
             _repository = repository;
             _jwtService = jwtService;
@@ -19,59 +22,77 @@ namespace auth.Controllers
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDTO dto) {
-            if (dto.imageKtp == null || dto.imageKtp.Length == 0)
-                return BadRequest("KTP image is required.");
+            try {
+                if (dto.imageKtp == null || dto.imageKtp.Length == 0)
+                    return BadRequest(new { message = "KTP image is required." });
 
-            // Save the uploaded file
-            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
-            string uniqueFileName = Guid.NewGuid().ToString() + "_" + dto.imageKtp.FileName;
-            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                if (string.IsNullOrWhiteSpace(dto.userId))
+                    return BadRequest(new { message = "User ID (NIK) is required." });
 
-            // Create directory if it doesn't exist
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
+                if (string.IsNullOrWhiteSpace(dto.userEmail) || !Regex.IsMatch(dto.userEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                    return BadRequest(new { message = "Invalid email format." });
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await dto.imageKtp.CopyToAsync(fileStream);
+                if (string.IsNullOrWhiteSpace(dto.password) || dto.password.Length < 6)
+                    return BadRequest(new { message = "Password must be at least 6 characters long." });
+
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), UploadsFolder);
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + dto.imageKtp.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // Create directory if it doesn't exist
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.imageKtp.CopyToAsync(fileStream);
+                }
+
+                // Create user
+                var user = new User
+                {
+                    userId = dto.userId,
+                    firstName = dto.firstName,
+                    lastName = dto.lastName,
+                    userEmail = dto.userEmail,
+                    userPhone = dto.userPhone,
+                    password = BCrypt.Net.BCrypt.HashPassword(dto.password),
+                    imageKtpPath = Path.Combine(UploadsFolder, uniqueFileName),
+                };
+
+                _repository.Create(user);
+
+                return Created("success", new { message = "User registered successfully." });
             }
-            var user = new User
-            {
-                userId = dto.userId, // Nanti isinya pake NIK, jangan generate
-                firstName = dto.firstName,
-                lastName = dto.lastName,
-                userEmail = dto.userEmail,
-                userPhone = dto.userPhone,
-                password = BCrypt.Net.BCrypt.HashPassword(dto.password),
-                imageKtpPath = Path.Combine("uploads", uniqueFileName),
-            };
-
-            _repository.Create(user);
-
-            return Created("success", new { message = "User registered successfully." });
+            catch (Exception ex) {
+                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+            }
         }
 
         [HttpPost("login")]
         public IActionResult Login(LoginDTO dto) {
-            var user = _repository.GetByEmail(dto.userEmail);
-            if (user == null) return BadRequest(new {message= "Account is not registered"});
-            if (!BCrypt.Net.BCrypt.Verify(dto.password, user.password))
-            {
-                return BadRequest(new {message= "Invalid Credentials"});
+            try {
+                var user = _repository.GetByEmail(dto.userEmail);
+                if (user == null)
+                    return BadRequest(new { message = "Account is not registered." });
+
+                if (!BCrypt.Net.BCrypt.Verify(dto.password, user.password))
+                    return BadRequest(new { message = "Invalid credentials." });
+
+                var jwt = _jwtService.generate(user.userId);
+
+                Response.Cookies.Append("jwt", jwt, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                });
+
+                return Ok(new { message = "Login successful." });
             }
-
-            var jwt = _jwtService.generate(user.userId);
-
-            Response.Cookies.Append("jwt", jwt, new CookieOptions
-            {
-                HttpOnly = true
-            });
-
-            return Ok(
-                new{
-                    message = "success"
-                }
-            );
+            catch (Exception ex) {
+                return StatusCode(500, new { message = "An error occurred during login.", error = ex.Message });
+            }
         }
 
         [HttpGet("user")]
@@ -80,16 +101,21 @@ namespace auth.Controllers
             try {
                 var jwt = Request.Cookies["jwt"];
 
-                var token = _jwtService.Verify(jwt);
+                if (string.IsNullOrWhiteSpace(jwt))
+                    return Unauthorized(new { message = "JWT token is missing." });
 
+                var token = _jwtService.Verify(jwt);
                 string userId = token.Issuer;
 
                 var user = _repository.GetById(userId);
 
+                if (user == null)
+                    return NotFound(new { message = "User not found." });
+
                 return Ok(user);
             }
-            catch (Exception _) {
-                return Unauthorized();
+            catch (Exception ex) {
+                return Unauthorized(new { message = "Unauthorized access.", error = ex.Message });
             }
         }
 
@@ -97,10 +123,7 @@ namespace auth.Controllers
         public IActionResult Logout()
         {
             Response.Cookies.Delete("jwt");
-            return Ok(new 
-            {
-                message = "success"
-            });
+            return Ok(new { message = "Logout successful." });
         }
     }
 }
