@@ -16,7 +16,7 @@ interface Book {
     country: string;
     language: string;
     genre: string;
-    desc: string;
+    description: string;
 }
 
 const ViewPageBook: React.FC = () => {
@@ -146,7 +146,7 @@ const ViewPageBook: React.FC = () => {
                         <input
                             id="desc"
                             type="text"
-                            value={book.desc}
+                            value={book.description}
                             disabled
                             className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                         />

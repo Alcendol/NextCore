@@ -10,7 +10,7 @@
         public  string? language {get; set;}
         public required string genre {get; set;}
         public required string description {get; set;}
-        public required byte[] image {get; set;}
+        public required string image {get; set;}
         public required string mediaType {get; set;} // nanti idenya pake ide user pak apw[0, 0, 0]
         public required int stock {get; set;}
     }

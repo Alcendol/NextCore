@@ -29,6 +29,7 @@ const BookPage: React.FC = () => {
     useEffect(() => {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/book`)
           .then((response) => {
+            console.log('API URL:', `${process.env.NEXT_PUBLIC_API_URL}/book`);
             if (!response.ok) {
               return response.text().then((text) => {
                 throw new Error(`Network response was not ok. Status: ${response.status}, ${text}`);
