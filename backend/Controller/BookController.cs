@@ -95,7 +95,8 @@ public class BookController : ControllerBase
                                 language = reader.IsDBNull(7) ? null : reader.GetString(7),
                                 genre = reader.GetString(8),
                                 description = reader.GetString(9),
-                                image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"], 
+                                // image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"], 
+                                image = reader.GetString(10),
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
                             };
@@ -189,7 +190,8 @@ public class BookController : ControllerBase
                                 language = reader.IsDBNull(7) ? null : reader.GetString(7),
                                 genre = reader.GetString(8),
                                 description = reader.GetString(9),
-                                image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"], 
+                                // image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"], 
+                                image = reader.GetString(10),
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
                             };
@@ -291,7 +293,8 @@ public class BookController : ControllerBase
                                 language = reader.IsDBNull(7) ? "" : reader.GetString(7),
                                 genre = reader.GetString(8),
                                 description = reader.GetString(9),
-                                image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
+                                // image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
+                                image = reader.GetString(10),
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
                             };
@@ -391,7 +394,8 @@ public class BookController : ControllerBase
                                 language = reader.IsDBNull(7) ? "" : reader.GetString(7),
                                 genre = reader.IsDBNull(8) ? "" : reader.GetString(8),
                                 description = reader.GetString(9),
-                                image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
+                                // image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
+                                image = reader.GetString(10),
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
                             };
@@ -490,7 +494,8 @@ public class BookController : ControllerBase
                                 language = reader.IsDBNull(7) ? null : reader.GetString(7),
                                 genre = reader.GetString(8),
                                 description = reader.GetString(9),
-                                image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
+                                // image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
+                                image = reader.GetString(10),
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
                             };
