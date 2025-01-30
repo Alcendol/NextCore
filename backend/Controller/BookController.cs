@@ -538,37 +538,6 @@ public class BookController : ControllerBase
                         }
                     }
 
-                    // Fetch existing genres and identify new ones
-                    string fetchGenresQuery = "SELECT genreName FROM genres";
-                    var existingGenres = new HashSet<string>();
-                    using (var fetchCommand = new MySqlCommand(fetchGenresQuery, connection, transaction))
-                    {
-                        using (var reader = fetchCommand.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                existingGenres.Add(reader.GetString(0));
-                            }
-                        }
-                    }
-
-                    var newGenres = book.genres.Except(existingGenres).ToList();
-
-                    // Insert new genres
-                    if (newGenres.Any())
-                    {
-                        string insertGenresQuery = "INSERT INTO genres (genreName) VALUES (@genreName)";
-                        using (var insertCommand = new MySqlCommand(insertGenresQuery, connection, transaction))
-                        {
-                            foreach (var genre in newGenres)
-                            {
-                                insertCommand.Parameters.Clear();
-                                insertCommand.Parameters.AddWithValue("@genreName", genre);
-                                insertCommand.ExecuteNonQuery();
-                            }
-                        }
-                    }
-
                     // Fetch all genreIds for the book's genres
                     string fetchGenreIdsQuery = @"
                         SELECT genreId FROM genres WHERE genreName IN (@genres)";
@@ -585,37 +554,6 @@ public class BookController : ControllerBase
                         }
                     }
 
-                    // Fetch existing authors and identify new ones
-                    string fetchAuthorsQuery = "SELECT authorNames FROM authors";
-                    var existingAuthors = new HashSet<string>();
-                    using (var fetchCommand = new MySqlCommand(fetchAuthorsQuery, connection, transaction))
-                    {
-                        using (var reader = fetchCommand.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                existingAuthors.Add(reader.GetString(0));
-                            }
-                        }
-                    }
-
-                    var newAuthors = book.authorNames.Except(existingAuthors).ToList();
-
-                    // Insert new authors
-                    if (newAuthors.Any())
-                    {
-                        string insertAuthorsQuery = "INSERT INTO authors (authorName) VALUES (@authorName)";
-                        using (var insertCommand = new MySqlCommand(insertAuthorsQuery, connection, transaction))
-                        {
-                            foreach (var author in newAuthors)
-                            {
-                                insertCommand.Parameters.Clear();
-                                insertCommand.Parameters.AddWithValue("@authorName", author);
-                                insertCommand.ExecuteNonQuery();
-                            }
-                        }
-                    }
-
                     // Fetch all authorIds for the book's authorships
                     string fetchAuthorIdsQuery = @"
                         SELECT authorId FROM authors WHERE authorName IN (@author)";
@@ -628,38 +566,6 @@ public class BookController : ControllerBase
                             while (reader.Read())
                             {
                                 authorIds.Add(reader.GetInt32(0));
-                            }
-                        }
-                    }
-
-
-                    // Fetch existing publishers and identify new ones
-                    string fetchPublishersQuery = "SELECT authorNames FROM publishers";
-                    var existingPublishers = new HashSet<string>();
-                    using (var fetchCommand = new MySqlCommand(fetchPublishersQuery, connection, transaction))
-                    {
-                        using (var reader = fetchCommand.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                existingPublishers.Add(reader.GetString(0));
-                            }
-                        }
-                    }
-
-                    var newPublishers = book.publisherNames.Except(existingPublishers).ToList();
-
-                    // Insert new publishers
-                    if (newPublishers.Any())
-                    {
-                        string insertPublishersQuery = "INSERT INTO publishers (publisherName) VALUES (@publisherName)";
-                        using (var insertCommand = new MySqlCommand(insertPublishersQuery, connection, transaction))
-                        {
-                            foreach (var publisher in newPublishers)
-                            {
-                                insertCommand.Parameters.Clear();
-                                insertCommand.Parameters.AddWithValue("@publisherName", publisher);
-                                insertCommand.ExecuteNonQuery();
                             }
                         }
                     }
