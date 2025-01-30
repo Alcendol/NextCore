@@ -1,17 +1,30 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace NextCore.backend.Dtos{
     public class BookRequestDTO{
+        [Required]
         public required string bookId {get; set;} // Nanti isinya pake isbn, jangan generate
+        [Required]
         public required List<string> authorNames {get; set;}
+        [Required]
         public required List<string> publisherNames {get; set;}
+        [Required]
         public required string title {get; set;}
+        [Required]
         public required DateTime datePublished {get; set;}
+        [Required]
         public required int totalPage {get; set;}
-        public  string? country {get; set;}
-        public  string? language {get; set;}
+        public string? country {get; set;}
+        public string? language {get; set;}
+        [Required]
         public required List<string> genres {get; set;}
+        [Required]
         public required string description {get; set;}
-        public required byte[] image {get; set;}
+        [Required]
+        public required IFormFile image {get; set;}
+        [Required]
         public required string mediaType {get; set;} // nanti idenya pake ide user pak apw[0, 0, 0]
+        [Required]
         public required int stock {get; set;}
     }
 }

@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using NextCore.backend.Dtos;
+using System.Text.RegularExpressions;
+using NextCore.backend.Repositories;
+using NextCore.backend.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,6 +15,7 @@ public class BookController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<BookController> _logger;
+    private const string UploadsFolder = "uploads";
     public List<BookResponseDTO> BooksList { get; set; } = new List<BookResponseDTO>();
 
     // Constructor with ILogger dependency injection
@@ -95,7 +99,7 @@ public class BookController : ControllerBase
                                 language = reader.IsDBNull(7) ? null : reader.GetString(7),
                                 genre = reader.GetString(8),
                                 description = reader.GetString(9),
-                                image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"], 
+                                image = reader.GetString(10),
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
                             };
@@ -189,7 +193,7 @@ public class BookController : ControllerBase
                                 language = reader.IsDBNull(7) ? null : reader.GetString(7),
                                 genre = reader.GetString(8),
                                 description = reader.GetString(9),
-                                image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"], 
+                                image = reader.GetString(10), 
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
                             };
@@ -291,7 +295,7 @@ public class BookController : ControllerBase
                                 language = reader.IsDBNull(7) ? "" : reader.GetString(7),
                                 genre = reader.GetString(8),
                                 description = reader.GetString(9),
-                                image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
+                                image = reader.GetString(10),
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
                             };
@@ -391,7 +395,7 @@ public class BookController : ControllerBase
                                 language = reader.IsDBNull(7) ? "" : reader.GetString(7),
                                 genre = reader.IsDBNull(8) ? "" : reader.GetString(8),
                                 description = reader.GetString(9),
-                                image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
+                                image = reader.GetString(10),
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
                             };
@@ -490,7 +494,7 @@ public class BookController : ControllerBase
                                 language = reader.IsDBNull(7) ? null : reader.GetString(7),
                                 genre = reader.GetString(8),
                                 description = reader.GetString(9),
-                                image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
+                                image = reader.GetString(10),
                                 mediaType = reader.GetString(11),
                                 stock = reader.GetInt32(12)
                             };
@@ -511,7 +515,7 @@ public class BookController : ControllerBase
     }
 
     [HttpPost("single")]
-    public IActionResult AddSingleBook([FromForm] BookRequestDTO book)
+    public async Task<IActionResult> AddSingleBook([FromForm] BookRequestDTO book)
     {
         _logger.LogDebug("Adding a single book to the library.");
 
@@ -527,7 +531,6 @@ public class BookController : ControllerBase
 
                 using (var transaction = connection.BeginTransaction())
                 {
-                    // Check if the book already exists
                     string checkBookQuery = "SELECT COUNT(1) FROM books WHERE bookId = @bookId";
                     using (var checkCommand = new MySqlCommand(checkBookQuery, connection, transaction))
                     {
@@ -538,7 +541,6 @@ public class BookController : ControllerBase
                         }
                     }
 
-                    // Fetch existing genres and identify new ones
                     string fetchGenresQuery = "SELECT genreName FROM genres";
                     var existingGenres = new HashSet<string>();
                     using (var fetchCommand = new MySqlCommand(fetchGenresQuery, connection, transaction))
@@ -553,8 +555,6 @@ public class BookController : ControllerBase
                     }
 
                     var newGenres = book.genres.Except(existingGenres).ToList();
-
-                    // Insert new genres
                     if (newGenres.Any())
                     {
                         string insertGenresQuery = "INSERT INTO genres (genreName) VALUES (@genreName)";
@@ -569,7 +569,6 @@ public class BookController : ControllerBase
                         }
                     }
 
-                    // Fetch all genreIds for the book's genres
                     string fetchGenreIdsQuery = @"
                         SELECT genreId FROM genres WHERE genreName IN (@genres)";
                     var genreIds = new List<int>();
@@ -585,56 +584,72 @@ public class BookController : ControllerBase
                         }
                     }
 
-                    // Fetch existing authors and identify new ones
-                    string fetchAuthorsQuery = "SELECT authorNames FROM authors";
-                    var existingAuthors = new HashSet<string>();
-                    using (var fetchCommand = new MySqlCommand(fetchAuthorsQuery, connection, transaction))
-                    {
-                        using (var reader = fetchCommand.ExecuteReader())
+                    string fetchAuthorsQuery = "SELECT firstName, lastName FROM authors";
+                        var existingAuthors = new HashSet<string>();
+                        using (var fetchCommand = new MySqlCommand(fetchAuthorsQuery, connection, transaction))
                         {
-                            while (reader.Read())
+                            using (var reader = fetchCommand.ExecuteReader())
                             {
-                                existingAuthors.Add(reader.GetString(0));
+                                while (reader.Read())
+                                {
+                                    existingAuthors.Add($"{reader.GetString(0)} {reader.GetString(1)}"); // Combining first and last names
+                                }
                             }
                         }
-                    }
 
-                    var newAuthors = book.authorNames.Except(existingAuthors).ToList();
-
-                    // Insert new authors
-                    if (newAuthors.Any())
-                    {
-                        string insertAuthorsQuery = "INSERT INTO authors (authorName) VALUES (@authorName)";
-                        using (var insertCommand = new MySqlCommand(insertAuthorsQuery, connection, transaction))
-                        {
-                            foreach (var author in newAuthors)
+                        var newAuthors = book.authorNames
+                            .Select(name =>
                             {
-                                insertCommand.Parameters.Clear();
-                                insertCommand.Parameters.AddWithValue("@authorName", author);
-                                insertCommand.ExecuteNonQuery();
+                                var parts = name.Split(' ', 2);
+                                return new
+                                {
+                                    firstName = parts[0],
+                                    lastName = parts.Length > 1 ? parts[1] : ""
+                                };
+                            })
+                            .Where(author => !existingAuthors.Contains($"{author.firstName} {author.lastName}"))
+                            .ToList();
+
+                        if (newAuthors.Any())
+                        {
+                            string insertAuthorsQuery = "INSERT INTO authors (firstName, lastName) VALUES (@firstName, @lastName)";
+                            using (var insertCommand = new MySqlCommand(insertAuthorsQuery, connection, transaction))
+                            {
+                                foreach (var author in newAuthors)
+                                {
+                                    insertCommand.Parameters.Clear();
+                                    insertCommand.Parameters.AddWithValue("@firstName", author.firstName);
+                                    insertCommand.Parameters.AddWithValue("@lastName", author.lastName);
+                                    insertCommand.ExecuteNonQuery();
+                                }
                             }
                         }
-                    }
 
-                    // Fetch all authorIds for the book's authorships
-                    string fetchAuthorIdsQuery = @"
-                        SELECT authorId FROM authors WHERE authorName IN (@author)";
-                    var authorIds = new List<int>();
-                    using (var fetchIdsCommand = new MySqlCommand(fetchAuthorIdsQuery, connection, transaction))
-                    {
-                        fetchIdsCommand.CommandText = fetchAuthorIdsQuery.Replace("@author", string.Join(",", book.authorNames.Select(g => $"'{g}'")));
-                        using (var reader = fetchIdsCommand.ExecuteReader())
+                        string fetchAuthorIdsQuery = @"
+                            SELECT authorId FROM authors 
+                            WHERE CONCAT(firstName, ' ', lastName) IN (@authorNames)";
+                        var authorIds = new List<int>();
+                        using (var fetchIdsCommand = new MySqlCommand(fetchAuthorIdsQuery, connection, transaction))
                         {
-                            while (reader.Read())
+                            var parameterNames = string.Join(",", book.authorNames.Select((_, i) => $"@authorName{i}"));
+                            fetchIdsCommand.CommandText = fetchAuthorIdsQuery.Replace("@authorNames", parameterNames);
+
+                            // Add each author name to the parameters
+                            for (int i = 0; i < book.authorNames.Count; i++)
                             {
-                                authorIds.Add(reader.GetInt32(0));
+                                fetchIdsCommand.Parameters.AddWithValue($"@authorName{i}", book.authorNames[i]);
+                            }
+
+                            using (var reader = fetchIdsCommand.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    authorIds.Add(reader.GetInt32(0));
+                                }
                             }
                         }
-                    }
 
-
-                    // Fetch existing publishers and identify new ones
-                    string fetchPublishersQuery = "SELECT authorNames FROM publishers";
+                    string fetchPublishersQuery = "SELECT publisherName FROM publishers";
                     var existingPublishers = new HashSet<string>();
                     using (var fetchCommand = new MySqlCommand(fetchPublishersQuery, connection, transaction))
                     {
@@ -648,8 +663,6 @@ public class BookController : ControllerBase
                     }
 
                     var newPublishers = book.publisherNames.Except(existingPublishers).ToList();
-
-                    // Insert new publishers
                     if (newPublishers.Any())
                     {
                         string insertPublishersQuery = "INSERT INTO publishers (publisherName) VALUES (@publisherName)";
@@ -663,8 +676,6 @@ public class BookController : ControllerBase
                             }
                         }
                     }
-
-                    // Fetch all publisherId for the book's booksPublished
                     string fetchPublisherIdsQuery = @"
                         SELECT publisherId FROM publishers WHERE publisherName IN (@publisher)";
                     var publisherIds = new List<int>();
@@ -680,7 +691,20 @@ public class BookController : ControllerBase
                         }
                     }
 
-                    // Insert the book
+                    string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), UploadsFolder);
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + book.image.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await book.image.CopyToAsync(fileStream);
+                    }
+
                     string insertBookQuery = @"
                         INSERT INTO books (bookId, title, datePublished, totalPage, country, language, description, image, mediaType) 
                         VALUES (@bookId, @title, @datePublished, @totalPage, @country, @language, @desc, @image, @mediaType)";
@@ -693,7 +717,7 @@ public class BookController : ControllerBase
                         bookCommand.Parameters.AddWithValue("@country", book.country);
                         bookCommand.Parameters.AddWithValue("@language", book.language);
                         bookCommand.Parameters.AddWithValue("@desc", book.description);
-                        bookCommand.Parameters.AddWithValue("@image", book.image);
+                        bookCommand.Parameters.AddWithValue("@image", uniqueFileName);
                         bookCommand.Parameters.AddWithValue("@mediaType", book.mediaType);
 
                         bookCommand.ExecuteNonQuery();
@@ -763,7 +787,6 @@ public class BookController : ControllerBase
         {
             _logger.LogError(ex, "Error occurred while adding a single book.");
             
-            // Return detailed error message with field information
             var errorResponse = new
             {
                 message = "Internal server error.",

@@ -37,7 +37,7 @@ const SignupPage = () => {
     formData.append("userEmail", userEmail);
     formData.append("userPhone", userPhone);
     formData.append("password", password);
-    formData.append("imageKtp", imageKtp);  // Fixed the issue here: imageKtp instead of fileInput.files[0]
+    formData.append("imageKtp", imageKtp);
     setLoading(true);
     try {
       const response = await fetch(`http://localhost:5259/api/register`, {

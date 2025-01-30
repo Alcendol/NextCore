@@ -9,7 +9,8 @@ import { useRouter } from "next/navigation";
 
 interface Author {
     authorId: string;
-    authorName: string;
+    firstName: string;
+    lastName: string;
     authorEmail: string;
     authorPhone: string;
 }
@@ -32,8 +33,11 @@ const CreatePageBook = () => {
     const [publishers, setPublishers] = useState<Publisher[]>([]);
     const [selectedPublisher, setSelectedPublisher] = useState<string[]>([]); // Change to array of strings
     const [genres, setGenres] = useState<Genre[]>([]);
-    const [selectedGenre, setSelectedGenre] = useState<string[]>([]); // Change to array of strings
-
+    const [selectedGenre, setSelectedGenre] = useState<string[]>([]);
+    const [preview, setPreview] = useState<string | null>(null);
+    const [imageBase64, setImageBase64] = useState<string | null>(null)
+    const [imageBook, setImageBook] = useState<File | null>(null);
+    
     const [isAuthorDropdownOpen, setIsAuthorDropdownOpen] = useState(false);
     const [isPublisherDropdownOpen, setIsPublisherDropdownOpen] = useState(false);
     const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false);
@@ -148,26 +152,20 @@ const CreatePageBook = () => {
             formData.append("bookId", bookId);
             formData.append("title", title);
     
-            selectedAuthor.forEach((author) => formData.append("authorNames[]", author));
-            selectedPublisher.forEach((publisher) => formData.append("publisherNames[]", publisher));
-            selectedGenre.forEach((genre) => formData.append("genres[]", genre));
+            selectedAuthor.forEach((author) => formData.append("authorNames", author));
+            selectedPublisher.forEach((publisher) => formData.append("publisherNames", publisher));
+            selectedGenre.forEach((genre) => formData.append("genres", genre));
     
             formData.append("datePublished", datePublished);
             formData.append("totalPage", totalPage);
             formData.append("country", country);
             formData.append("language", language);
             formData.append("description", desc);
+            formData.append("image", image);
             formData.append("stock", stock);
-    
-            if (image) {
-                formData.append("image", image);
-            } else {
-                console.error("Image not found");
-            }
     
             formData.append("mediaType", mediaType);
     
-            // Log formData to verify the content
             for (let pair of formData.entries()) {
                 console.log(`${pair[0]}:`, pair[1]);
             }
@@ -180,6 +178,7 @@ const CreatePageBook = () => {
             if (res.ok) {
                 router.push("/admindashboard/book");
             } else {
+                console.log(formData);
                 const errorData = await res.json();
                 console.error("Error response:", errorData);
                 alert(`Error: ${errorData?.title || "Failed to Create New Book"}`);
@@ -223,40 +222,42 @@ const CreatePageBook = () => {
                         value={title}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                     />
-                    <label htmlFor="authors" className="block mt-4 font-sans text-sm text-gray-700">Authors:</label>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {selectedAuthor.map((author, index) => (
-                            <div key={index} className="flex items-center space-x-2 bg-blue-100 rounded px-2 py-1">
-                                <span>{author}</span>
-                                <button
-                                    type="button"
-                                    onClick={() => handleTagRemove("author", author)}
-                                    className="text-red-500"
-                                >
-                                    &times;
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                    <button type="button" onClick={toggleAuthorDropdown} className="w-full p-2 border rounded bg-gray-200 mt-2 text-left">
-                        Select Authors
-                    </button>
-                    {isAuthorDropdownOpen && (
-                        <div className="absolute w-full bg-white border mt-1 rounded shadow-lg z-10">
-                            <div className="max-h-60 overflow-y-auto">
-                                {authors.map((author) => (
+                    <div className="relative mt-4">
+                        <label htmlFor="authors" className="block mt-4 font-sans text-sm text-gray-700">Authors:</label>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {selectedAuthor.map((author, index) => (
+                                <div key={index} className="flex items-center space-x-2 bg-blue-100 rounded px-2 py-1">
+                                    <span>{author}</span>
                                     <button
-                                        key={author.authorId}
                                         type="button"
-                                        onClick={() => handleAuthorSelect(author.authorName)}
-                                        className="w-full text-left p-2 hover:bg-gray-200"
+                                        onClick={() => handleTagRemove("author", author)}
+                                        className="text-red-500"
                                     >
-                                        {author.authorName}
+                                        &times;
                                     </button>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
                         </div>
-                    )}
+                        <button type="button" onClick={toggleAuthorDropdown} className="w-full p-2 border rounded bg-gray-200 mt-2 text-left">
+                            Select Authors
+                        </button>
+                        {isAuthorDropdownOpen && (
+                            <div className="absolute w-full bg-white border mt-1 rounded shadow-lg z-10">
+                                <div className="max-h-60 overflow-y-auto">
+                                    {authors.map((author) => (
+                                        <button
+                                            key={author.authorId}
+                                            type="button"
+                                            onClick={() => handleAuthorSelect(author.firstName)}
+                                            className="w-full text-left p-2 hover:bg-gray-200"
+                                        >
+                                            {author.firstName} {author.lastName}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                     <label htmlFor="datePublished" className="block text-sm text-gray-700 font-sans mt-4 mb-2">
                         Published Date:
                     </label>
@@ -267,7 +268,7 @@ const CreatePageBook = () => {
                         value={datePublished}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 text-gray-400"
                     />
-                    <div className=" mt-4">
+                    <div className="relative mt-4">
                         <label htmlFor="publishers" className="block mt-4 font-sans text-sm text-gray-700">Publishers:</label>
                         <div className="flex flex-wrap gap-2 mt-2">
                             {selectedPublisher.map((publisher, index) => (
@@ -314,7 +315,7 @@ const CreatePageBook = () => {
                         placeholder="e.g: 128"
                         className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                     />
-                    <div className="mt-4">
+                    <div className="relative mt-4">
                         <label htmlFor="genres" className="block mt-4 font-sans text-sm text-gray-700">Genres:</label>
                         <div className="flex flex-wrap gap-2 mt-2">
                             {selectedGenre.map((genre, index) => (
@@ -388,25 +389,22 @@ const CreatePageBook = () => {
                     </label>
                     <input
                         id="image"
+                        name="image"
                         type="file"
                         accept="image/*"
-                        onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                                setImage(file);
-                                console.log(file);
-                            }
-                        }}
+                        required
+                        onChange={(e) => setImage(e.target.files?.[0] || null)}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                     />
-                    {image && (
+
+                    {preview && (
                         <div className="mt-4">
                             <Image
-                                src={URL.createObjectURL(image as Blob)}
-                                alt="Preview"
-                                width={100}
-                                height={100}
-                                className="rounded-lg"
+                                src={preview}
+                                alt="Book Preview"
+                                width={200}
+                                height={300}
+                                className="rounded-lg border"
                             />
                         </div>
                     )}
