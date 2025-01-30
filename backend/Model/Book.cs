@@ -12,8 +12,6 @@ namespace NextCore.backend.Models{
         [Required]
         public required DateOnly datePublished {get; set;}
         public int totalPage {get; set;}
-        public  string? country {get; set;}
-        public  string? language {get; set;}
         [Required]
         public required string description {get; set;}
         [Required]
