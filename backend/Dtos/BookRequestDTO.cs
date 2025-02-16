@@ -5,19 +5,19 @@ namespace NextCore.backend.Dtos{
         [Required]
         public required string bookId {get; set;} // Nanti isinya pake isbn, jangan generate
         [Required]
-        public required List<string> authorNames {get; set;}
+        public required List<int> authorIds {get; set;}
         [Required]
-        public required List<string> publisherNames {get; set;}
+        public required List<int> publisherIds {get; set;}
         [Required]
         public required string title {get; set;}
         [Required]
-        public required DateTime datePublished {get; set;}
+        public required DateOnly datePublished {get; set;}
         [Required]
         public required int totalPage {get; set;}
         public string? country {get; set;}
         public string? language {get; set;}
         [Required]
-        public required List<string> genres {get; set;}
+        public required List<int> genreIds {get; set;}
         [Required]
         public required string description {get; set;}
         [Required]

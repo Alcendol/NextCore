@@ -2,11 +2,11 @@ using NextCore.backend.Models;
 using NextCore.backend.Dtos;
 namespace NextCore.backend.Repositories{
     public interface IBookRepository {
-        Task<IEnumerable<Book>> GetBooks();
-        Task<Book> GetBookById(string bookId);
-        Task <IEnumerable<Book>> GetBooksByAuthorId(string authorId);
-        Task <IEnumerable<Book>> GetBooksByPublisherId(string publisherId);
-        Task <IEnumerable<Book>> GetBooksByGenreId(string genreId);
-        Task <List<Book>> AddBooks(List<BookRequestDTO> books);
+        Task<IEnumerable<BookResponseDTO>> GetAll();
+        Task<BookResponseDTO> GetBookById(string bookId);
+        Task <IEnumerable<BookResponseDTO>> GetBooksByAuthorId(string authorId);
+        Task <IEnumerable<BookResponseDTO>> GetBooksByPublisherId(string publisherId);
+        Task <IEnumerable<BookResponseDTO>> GetBooksByGenreId(string genreId);
+        Task <int> AddBook(BookRequestDTO book);
     }
 }

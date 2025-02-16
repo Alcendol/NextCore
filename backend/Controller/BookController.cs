@@ -9,704 +9,81 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using NextCore.backend.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Threading.Tasks;
 [Route("api/book")]
 [ApiController]
 public class BookController : ControllerBase
 {
     private readonly IConfiguration _configuration;
+    private readonly IBookRepository _bookRepo;
     private readonly ILogger<BookController> _logger;
     private const string UploadsFolder = "uploads";
     public List<BookResponseDTO> BooksList { get; set; } = new List<BookResponseDTO>();
 
     // Constructor with ILogger dependency injection
-    public BookController(IConfiguration configuration, ILogger<BookController> logger)
+    public BookController(IConfiguration configuration, ILogger<BookController> logger, IBookRepository bookRepo)
     {
         _configuration = configuration;
         _logger = logger;
+        _bookRepo = bookRepo;
     }
 
     [HttpGet]
-    public ActionResult<List<Book>> Index()
-    {
-        _logger.LogDebug("Fetching all books from the database.");
-
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-            _logger.LogDebug("Connection string retrieved.");
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-                _logger.LogDebug("Database connection opened.");
-
-                string query = @"
-                    SELECT 
-                        b.bookId, 
-                        GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') AS authorName,
-                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
-                        b.title, 
-                        b.datePublished,
-                        b.totalPage, 
-                        b.country, 
-                        b.language, 
-                        (   SELECT 
-                                GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ')
-                            FROM 
-                                BookGenres bg
-                            JOIN 
-                                Genres g ON bg.genreId = g.genreId
-                            WHERE 
-                                bg.bookId = b.bookId) AS genre, 
-                        b.description, 
-                        b.image, 
-                        b.mediaType, 
-                        COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
-                    FROM 
-                        Books b
-                    JOIN 
-                        BooksPublished bp ON b.bookId = bp.bookId
-                    JOIN 
-                        Publishers p ON bp.publisherId = p.publisherId
-                    JOIN 
-                        Authorships at ON b.bookId = at.bookId
-                    JOIN 
-                        Authors a ON a.authorId = at.authorId
-                    JOIN
-                        BookCopies bc ON bc.bookId = b.bookId
-                    GROUP BY 
-                        b.bookId;
-                ";
-                _logger.LogDebug("Executing query: {Query}", query);
-
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    using (MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        _logger.LogDebug("Query executed successfully. Reading data...");
-
-                        while (reader.Read())
-                        {
-                            BookResponseDTO book = new BookResponseDTO
-                            {
-                                bookId = reader.GetString(0),
-                                authorName = reader.GetString(1),
-                                publisherName = reader.GetString(2),
-                                title = reader.GetString(3),
-                                datePublished = reader.GetDateTime(4),
-                                totalPage = reader.GetInt32(5),
-                                country = reader.IsDBNull(6) ? null : reader.GetString(6),
-                                language = reader.IsDBNull(7) ? null : reader.GetString(7),
-                                genre = reader.GetString(8),
-                                description = reader.GetString(9),
-                                // image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"], 
-                                image = reader.GetString(10),
-                                mediaType = reader.GetString(11),
-                                stock = reader.GetInt32(12)
-                            };
-                            BooksList.Add(book);
-                        }
-                    }
-                }
-            }
-
-            _logger.LogDebug("Books successfully fetched.");
-            return Ok(BooksList);
+    public async Task<ActionResult<IEnumerable<BookResponseDTO>>> Index(){
+        var books = await _bookRepo.GetAll();
+        if (books == null){
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while fetching books.");
-            return StatusCode(500, "Internal server error");
-        }
+        return Ok(books);
     }
 
     [HttpGet("by-id/{bookId}")]
-    public ActionResult<Book> getBookByBookId(string bookId){
-        _logger.LogDebug("Fetching book by bookId from the database.");
-
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-            _logger.LogDebug("Connection string retrieved.");
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-                _logger.LogDebug("Database connection opened.");
-
-                string query = @"
-                    SELECT 
-                        b.bookId, 
-                        GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') AS authorName,
-                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
-                        b.title, 
-                        b.datePublished,
-                        b.totalPage, 
-                        b.country, 
-                        b.language, 
-                        (   SELECT 
-                                GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ')
-                            FROM 
-                                BookGenres bg
-                            JOIN 
-                                Genres g ON bg.genreId = g.genreId
-                            WHERE 
-                                bg.bookId = b.bookId) AS genre, 
-                        b.description, 
-                        b.image, 
-                        b.mediaType, 
-                        COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
-                    FROM 
-                        Books b
-                    JOIN 
-                        BooksPublished bp ON b.bookId = bp.bookId
-                    JOIN 
-                        Publishers p ON bp.publisherId = p.publisherId
-                    JOIN 
-                        Authorships at ON b.bookId = at.bookId
-                    JOIN 
-                        Authors a ON a.authorId = at.authorId
-                    JOIN
-                        BookCopies bc ON bc.bookId = b.bookId
-                    WHERE
-                        b.bookId = @bookId
-                    GROUP BY 
-                        b.bookId;
-                ";
-                _logger.LogDebug("Executing query: {Query}", query);
-
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@bookId", bookId);
-                    using (MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        _logger.LogDebug("Query executed successfully. Reading data...");
-                        if(reader.Read())
-                        {    BookResponseDTO book = new BookResponseDTO
-                            {
-                                bookId = reader.GetString(0),
-                                authorName = reader.GetString(1),
-                                publisherName = reader.GetString(2),
-                                title = reader.GetString(3),
-                                datePublished = reader.GetDateTime(4),
-                                totalPage = reader.GetInt32(5),
-                                country = reader.IsDBNull(6) ? null : reader.GetString(6),
-                                language = reader.IsDBNull(7) ? null : reader.GetString(7),
-                                genre = reader.GetString(8),
-                                description = reader.GetString(9),
-                                // image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"], 
-                                image = reader.GetString(10),
-                                mediaType = reader.GetString(11),
-                                stock = reader.GetInt32(12)
-                            };
-                            _logger.LogDebug("Book fetched successfully");
-                            return Ok(book);
-                        }
-                        else{
-                            _logger.LogWarning("No book found with the given id: {bookId}", bookId);
-                            return NotFound("Book not found.");
-                        }
-                    }
-                }
-            }
+    public async Task<ActionResult<BookResponseDTO>> getBookById(string bookId){
+        var book = await _bookRepo.GetBookById(bookId);
+        if (book == null){
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while fetching books.");
-            return StatusCode(500, "Internal server error");
-        }
+        return Ok(book);
     }
     
 
     [HttpGet("by-author/{authorId}")]
-    public ActionResult<List<Book>> getBooksByAuthorId(string authorId)
-    {
-        _logger.LogDebug("Fetching books by authorId: {AuthorId}", authorId);
-
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-            _logger.LogDebug("Connection string retrieved.");
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-                _logger.LogDebug("Database connection opened.");
-
-                string query = @"
-                    SELECT 
-                        b.bookId, 
-                        GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') AS authorName,
-                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
-                        b.title, 
-                        b.datePublished,
-                        b.totalPage, 
-                        b.country, 
-                        b.language, 
-                        (   SELECT 
-                                GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ')
-                            FROM 
-                                BookGenres bg
-                            JOIN 
-                                Genres g ON bg.genreId = g.genreId
-                            WHERE 
-                                bg.bookId = b.bookId) AS genre, 
-                        b.description, 
-                        b.image, 
-                        b.mediaType, 
-                        COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
-                    FROM 
-                        Books b
-                    JOIN 
-                        BooksPublished bp ON b.bookId = bp.bookId
-                    JOIN 
-                        Publishers p ON bp.publisherId = p.publisherId
-                    JOIN 
-                        Authorships at ON b.bookId = at.bookId
-                    JOIN 
-                        Authors a ON a.authorId = at.authorId
-                    JOIN
-                        BookCopies bc ON bc.bookId = b.bookId
-                    WHERE 
-                        a.authorId = @AuthorId
-                    GROUP BY 
-                        b.bookId;
-                ";
-
-                _logger.LogDebug("Executing query for authorId: {AuthorId}", authorId);
-
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@AuthorId", authorId);
-
-                    using (MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        _logger.LogDebug("Query executed successfully. Reading data...");
-
-                        while (reader.Read())
-                        {
-                            BookResponseDTO book = new BookResponseDTO
-                            {
-                                bookId = reader.GetString(0),
-                                authorName = reader.GetString(1),
-                                publisherName = reader.GetString(2),
-                                title = reader.GetString(3),
-                                datePublished = reader.GetDateTime(4),
-                                totalPage = reader.GetInt32(5),
-                                country = reader.IsDBNull(6) ? "" : reader.GetString(6),
-                                language = reader.IsDBNull(7) ? "" : reader.GetString(7),
-                                genre = reader.GetString(8),
-                                description = reader.GetString(9),
-                                // image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
-                                image = reader.GetString(10),
-                                mediaType = reader.GetString(11),
-                                stock = reader.GetInt32(12)
-                            };
-                            BooksList.Add(book);
-                        }
-                    }
-                }
-            }
-
-            _logger.LogDebug("Books successfully fetched. Total: {Count}", BooksList.Count);
-            return Ok(BooksList);
+    public async Task<ActionResult<List<BookResponseDTO>>> getBooksByAuthorId(string authorId){
+        var books = await _bookRepo.GetBooksByAuthorId(authorId);
+        if (books == null){
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while fetching books by authorId.");
-            return StatusCode(500, "Internal server error");
-        }
+        return Ok(books);
     }
 
 
     [HttpGet("by-publisher/{publisherId}")]
-    public ActionResult<List<Book>> getBooksByPublisherId(string publisherId)
-    {
-        _logger.LogDebug("Fetching books by publisherId: {PublisherId}", publisherId);
-
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-            _logger.LogDebug("Connection string retrieved.");
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-                _logger.LogDebug("Database connection opened.");
-
-                string query = @"
-                    SELECT 
-                        b.bookId, 
-                        GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') AS authorName,
-                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
-                        b.title, 
-                        b.datePublished,
-                        b.totalPage, 
-                        b.country, 
-                        b.language, 
-                        (   SELECT 
-                                GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ')
-                            FROM 
-                                BookGenres bg
-                            JOIN 
-                                Genres g ON bg.genreId = g.genreId
-                            WHERE 
-                                bg.bookId = b.bookId) AS genre, 
-                        b.description, 
-                        b.image, 
-                        b.mediaType, 
-                        COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
-                    FROM 
-                        Books b
-                    JOIN 
-                        BooksPublished bp ON b.bookId = bp.bookId
-                    JOIN 
-                        Publishers p ON bp.publisherId = p.publisherId
-                    JOIN 
-                        Authorships at ON b.bookId = at.bookId
-                    JOIN 
-                        Authors a ON a.authorId = at.authorId
-                    JOIN
-                        BookCopies bc ON bc.bookId = b.bookId
-                    WHERE 
-                        p.publisherId = @publisherId
-                    GROUP BY 
-                        b.bookId;
-                ";
-
-                _logger.LogDebug("Executing query: {Query}", query);
-
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@publisherId", publisherId);
-
-                    using (MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        _logger.LogDebug("Query executed successfully. Reading data...");
-
-                        while (reader.Read())
-                        {
-                            BookResponseDTO book = new BookResponseDTO
-                            {
-                                bookId = reader.GetString(0),
-                                authorName = reader.GetString(1),
-                                publisherName = reader.GetString(2),
-                                title = reader.GetString(3),
-                                datePublished = reader.GetDateTime(4),
-                                totalPage = reader.GetInt32(5),
-                                country = reader.IsDBNull(6) ? "" : reader.GetString(6),
-                                language = reader.IsDBNull(7) ? "" : reader.GetString(7),
-                                genre = reader.IsDBNull(8) ? "" : reader.GetString(8),
-                                description = reader.GetString(9),
-                                // image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
-                                image = reader.GetString(10),
-                                mediaType = reader.GetString(11),
-                                stock = reader.GetInt32(12)
-                            };
-                            BooksList.Add(book);
-                        }
-                    }
-                }
-            }
-
-            _logger.LogDebug("Books successfully fetched. Total: {Count}", BooksList.Count);
-            return Ok(BooksList);
+    public async Task<ActionResult<List<BookResponseDTO>>> getBooksByPublisherId(string publisherId){
+        var books = await _bookRepo.GetBooksByPublisherId(publisherId);
+        if (books == null){
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while fetching books by publisherId.");
-            return StatusCode(500, "Internal server error");
-        }
+        return Ok(books);
     }
 
     [HttpGet("by-genre/{genreId}")]
-    public ActionResult<List<Book>> getBooksByGenre(string genreId)
-    {
-        _logger.LogDebug("Fetching books by genreId from the database.");
-
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-            _logger.LogDebug("Connection string retrieved.");
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-                _logger.LogDebug("Database connection opened.");
-                // yang ini masih tricky jangan diotak atik dulu
-                string query = @"
-                    SELECT 
-                        b.bookId, 
-                        GROUP_CONCAT(DISTINCT CONCAT(a.firstName, ' ', a.lastName) SEPARATOR ', ') AS authorName,
-                        GROUP_CONCAT(DISTINCT p.publisherName SEPARATOR ', ') AS publisherName,
-                        b.title, 
-                        b.datePublished,
-                        b.totalPage, 
-                        b.country, 
-                        b.language, 
-                        (   SELECT 
-                                GROUP_CONCAT(DISTINCT g.genreName SEPARATOR ', ')
-                            FROM 
-                                BookGenres bg
-                            JOIN 
-                                Genres g ON bg.genreId = g.genreId
-                            WHERE 
-                                bg.bookId = b.bookId) AS genre, 
-                        b.description, 
-                        b.image, 
-                        b.mediaType, 
-                        COUNT(CASE WHEN bc.status = 'Available' THEN 1 END) AS Stock 
-                    FROM 
-                        Books b
-                    JOIN 
-                        BooksPublished bp ON b.bookId = bp.bookId
-                    JOIN 
-                        Publishers p ON bp.publisherId = p.publisherId
-                    JOIN 
-                        Authorships at ON b.bookId = at.bookId
-                    JOIN 
-                        Authors a ON a.authorId = at.authorId
-                    JOIN
-                        BookCopies bc ON bc.bookId = b.bookId
-                    WHERE 
-                        g.genreId = @genreId
-                    GROUP BY 
-                        b.bookId
-                    ";
-
-                _logger.LogDebug("Executing query: {Query}", query);
-
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@genreId", genreId);
-
-                    using (MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        _logger.LogDebug("Query executed successfully. Reading data...");
-
-                        while (reader.Read())
-                        {
-                            BookResponseDTO book = new BookResponseDTO
-                            {
-                                bookId = reader.GetString(0),
-                                authorName = reader.GetString(1),
-                                publisherName = reader.GetString(2),
-                                title = reader.GetString(3),
-                                datePublished = reader.GetDateTime(4),
-                                totalPage = reader.GetInt32(5),
-                                country = reader.IsDBNull(6) ? null : reader.GetString(6),
-                                language = reader.IsDBNull(7) ? null : reader.GetString(7),
-                                genre = reader.GetString(8),
-                                description = reader.GetString(9),
-                                // image = reader.IsDBNull(10) ? Array.Empty<byte>() : (byte[])reader["image"],
-                                image = reader.GetString(10),
-                                mediaType = reader.GetString(11),
-                                stock = reader.GetInt32(12)
-                            };
-                            BooksList.Add(book);
-                        }
-
-                        _logger.LogDebug("Books successfully fetched.");
-                        return Ok(BooksList); // Return the list of books
-                    }
-                }
-            }
+    public async Task<ActionResult<List<BookResponseDTO>>> getBooksByGenreId(string genreId){
+        var books = await _bookRepo.GetBooksByPublisherId(genreId);
+        if (books == null){
+            return NotFound();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while fetching books.");
-            return StatusCode(500, "Internal server error");
-        }
+        return Ok(books);
     }
 
-    [HttpPost("single")]
-    public async Task<IActionResult> AddSingleBook([FromForm] BookRequestDTO book)
-    {
-        _logger.LogDebug("Adding a single book to the library.");
-
-        book.country ??= "";
-        book.language ??= "";
-
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "";
-            using (var connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-
-                using (var transaction = connection.BeginTransaction())
-                {
-                    string checkBookQuery = "SELECT COUNT(1) FROM books WHERE bookId = @bookId";
-                    using (var checkCommand = new MySqlCommand(checkBookQuery, connection, transaction))
-                    {
-                        checkCommand.Parameters.AddWithValue("@bookId", book.bookId);
-                        if (Convert.ToInt32(checkCommand.ExecuteScalar()) > 0)
-                        {
-                            return Conflict("The book with this ID already exists.");
-                        }
-                    }
-
-                    string fetchGenreIdsQuery = @"
-                        SELECT genreId FROM genres WHERE genreName IN (@genres)";
-                    var genreIds = new List<int>();
-                    using (var fetchIdsCommand = new MySqlCommand(fetchGenreIdsQuery, connection, transaction))
-                    {
-                        fetchIdsCommand.CommandText = fetchGenreIdsQuery.Replace("@genres", string.Join(",", book.genres.Select(g => $"'{g}'")));
-                        using (var reader = fetchIdsCommand.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                genreIds.Add(reader.GetInt32(0));
-                            }
-                        }
-                    }
-
-                        string fetchAuthorIdsQuery = @"
-                            SELECT authorId FROM authors 
-                            WHERE CONCAT(firstName, ' ', lastName) IN (@authorNames)";
-                        var authorIds = new List<int>();
-                        using (var fetchIdsCommand = new MySqlCommand(fetchAuthorIdsQuery, connection, transaction))
-                        {
-                            var parameterNames = string.Join(",", book.authorNames.Select((_, i) => $"@authorName{i}"));
-                            fetchIdsCommand.CommandText = fetchAuthorIdsQuery.Replace("@authorNames", parameterNames);
-
-                            // Add each author name to the parameters
-                            for (int i = 0; i < book.authorNames.Count; i++)
-                            {
-                                fetchIdsCommand.Parameters.AddWithValue($"@authorName{i}", book.authorNames[i]);
-                            }
-
-                            using (var reader = fetchIdsCommand.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    authorIds.Add(reader.GetInt32(0));
-                                }
-                            }
-                        }
-
-                    // Fetch all publisherId for the book's booksPublished
-                    string fetchPublisherIdsQuery = @"
-                        SELECT publisherId FROM publishers WHERE publisherName IN (@publisher)";
-                    var publisherIds = new List<int>();
-                    using (var fetchIdsCommand = new MySqlCommand(fetchPublisherIdsQuery, connection, transaction))
-                    {
-                        fetchIdsCommand.CommandText = fetchPublisherIdsQuery.Replace("@publisher", string.Join(",", book.publisherNames.Select(g => $"'{g}'")));
-                        using (var reader = fetchIdsCommand.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                publisherIds.Add(reader.GetInt32(0));
-                            }
-                        }
-                    }
-
-                    string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), UploadsFolder);
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + book.image.FileName;
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await book.image.CopyToAsync(fileStream);
-                    }
-
-                    string insertBookQuery = @"
-                        INSERT INTO books (bookId, title, datePublished, totalPage, country, language, description, image, mediaType) 
-                        VALUES (@bookId, @title, @datePublished, @totalPage, @country, @language, @desc, @image, @mediaType)";
-                    using (var bookCommand = new MySqlCommand(insertBookQuery, connection, transaction))
-                    {
-                        bookCommand.Parameters.AddWithValue("@bookId", book.bookId);
-                        bookCommand.Parameters.AddWithValue("@title", book.title);
-                        bookCommand.Parameters.AddWithValue("@datePublished", book.datePublished);
-                        bookCommand.Parameters.AddWithValue("@totalPage", book.totalPage);
-                        bookCommand.Parameters.AddWithValue("@country", book.country);
-                        bookCommand.Parameters.AddWithValue("@language", book.language);
-                        bookCommand.Parameters.AddWithValue("@desc", book.description);
-                        bookCommand.Parameters.AddWithValue("@image", uniqueFileName);
-                        bookCommand.Parameters.AddWithValue("@mediaType", book.mediaType);
-
-                        bookCommand.ExecuteNonQuery();
-                    }
-
-                    // Insert into bookGenres
-                    string insertBookGenresQuery = "INSERT INTO bookGenres (bookId, genreId) VALUES (@bookId, @genreId)";
-                    using (var bookGenresCommand = new MySqlCommand(insertBookGenresQuery, connection, transaction))
-                    {
-                        foreach (var genreId in genreIds)
-                        {
-                            bookGenresCommand.Parameters.Clear();
-                            bookGenresCommand.Parameters.AddWithValue("@bookId", book.bookId);
-                            bookGenresCommand.Parameters.AddWithValue("@genreId", genreId);
-
-                            bookGenresCommand.ExecuteNonQuery();
-                        }
-                    }
-
-                    // Insert into authorships
-                    string insertAuthorshipsQuery = "INSERT INTO authorships (bookId, authorId) VALUES (@bookId, @authorId)";
-                    using (var authorshipsCommand = new MySqlCommand(insertAuthorshipsQuery, connection, transaction))
-                    {
-                        foreach (var authorId in authorIds)
-                        {
-                            authorshipsCommand.Parameters.Clear();
-                            authorshipsCommand.Parameters.AddWithValue("@bookId", book.bookId);
-                            authorshipsCommand.Parameters.AddWithValue("@authorId", authorId);
-
-                            authorshipsCommand.ExecuteNonQuery();
-                        }
-                    }
-
-                    // Insert into booksPublished
-                    string insertBooksPublishedQuery = "INSERT INTO booksPublished (bookId, publisherId) VALUES (@bookId, @publisherId)";
-                    using (var booksPublishedCommand = new MySqlCommand(insertBooksPublishedQuery, connection, transaction))
-                    {
-                        foreach (var publisherId in publisherIds)
-                        {
-                            booksPublishedCommand.Parameters.Clear();
-                            booksPublishedCommand.Parameters.AddWithValue("@bookId", book.bookId);
-                            booksPublishedCommand.Parameters.AddWithValue("@publisherId", publisherId);
-
-                            booksPublishedCommand.ExecuteNonQuery();
-                        }
-                    }
-
-                    // Insert book copies
-                    string insertBookCopiesQuery = "INSERT INTO bookCopies (bookId, status) VALUES (@bookId, @status)";
-                    using(var bookCopiesCommand = new MySqlCommand(insertBookCopiesQuery, connection, transaction)){
-                        for (int i = 0; i < book.stock; i++){
-                            bookCopiesCommand.Parameters.Clear();
-                            bookCopiesCommand.Parameters.AddWithValue("@bookId", book.bookId);
-                            bookCopiesCommand.Parameters.AddWithValue("@status", bookStatus.Available);
-
-                            bookCopiesCommand.ExecuteNonQuery();
-                        }
-                    }
-                    transaction.Commit();
-                }
-            }
-
-            _logger.LogDebug("Book successfully added.");
-            return Ok(book);
+    [HttpPost("add")]
+    public async Task<IActionResult> AddBook([FromForm] BookRequestDTO book){
+        int row = await _bookRepo.AddBook(book);
+        if (row == 0){
+            return BadRequest("Failed while creating book");
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while adding a single book.");
-            
-            var errorResponse = new
-            {
-                message = "Internal server error.",
-                error = ex.Message,
-                stackTrace = ex.StackTrace
-            };
-
-            return StatusCode(500, errorResponse);
-        }
-    }
+        return CreatedAtAction(nameof(AddBook), new {id = book.bookId});
+    }   
 
 
     // [HttpPost("multiple")]
